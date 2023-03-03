@@ -24,8 +24,8 @@
     "test:e2e": "se run test:e2e"
   },
   "dependencies": {
-    "@nestjs/common": "^9.0.0",
-    "@nestjs/core": "^9.0.0",
+    "@nestjs/common": "^9.3.9",
+    "@nestjs/core": "^9.3.9",
     "@nestjs/mongoose": "^9.2.1",
     "@nestjs/platform-express": "^9.0.0",
     "mongoose": "^6.10.1",
