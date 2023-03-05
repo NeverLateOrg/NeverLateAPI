@@ -1,7 +1,7 @@
 const { leaf, runner, branch } = require('scriptease-cli');
 
 leaf('test', async () => {
-  await runner.npxExec('jest');
+  await runner.npxExec('jest', [], [{ option: '--passWithNoTests' }]);
 });
 
 branch('test', () => {
