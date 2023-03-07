@@ -8,6 +8,7 @@ export class EventsController {
 
   @Post()
   public async createEvent(@Body() dto: CreateEventDTO): Promise<ResponseEventDTO> {
+    // TODO: handle errors
     return await this.eventsService.createEvent(dto);
   }
 
