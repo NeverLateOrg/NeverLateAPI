@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { CreateEventDTO, ResponseEventDTO } from './dto';
 import { EventsService } from './events.service';
 
@@ -7,7 +7,12 @@ export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Post()
-  public async addEvent(@Body() dto: CreateEventDTO): Promise<ResponseEventDTO> {
-    return await this.eventsService.addEvent(dto);
+  public async createEvent(@Body() dto: CreateEventDTO): Promise<ResponseEventDTO> {
+    return await this.eventsService.createEvent(dto);
+  }
+
+  @Get()
+  public async findAllEvents(): Promise<ResponseEventDTO[]> {
+    return await this.eventsService.findAllEvents();
   }
 }

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { EventsController } from './events.controller';
-import { EventSchema } from './events.schema';
+import { EventSchema } from './schemas/event.schema';
 import { EventsService } from './events.service';
 
 @Module({

@@ -3,7 +3,6 @@ import { IsDate, IsNotEmpty, IsString } from 'class-validator';
 
 export class EventDTO {
   public _id: string;
-  public __v: number;
 
   @IsString()
   @IsNotEmpty()
