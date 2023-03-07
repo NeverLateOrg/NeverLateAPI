@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { CreateEventDTO, ResponseEventDTO } from './dto';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Post } from '@nestjs/common';
+import { CreateEventDTO, DeleteEventDTO, ResponseEventDTO } from './dto';
 import { EventsService } from './events.service';
 
 @Controller('events')
@@ -14,5 +14,12 @@ export class EventsController {
   @Get()
   public async findAllEvents(): Promise<ResponseEventDTO[]> {
     return await this.eventsService.findAllEvents();
+  }
+
+  @Delete()
+  public async deleteEvent(@Body() dto: DeleteEventDTO): Promise<void> {
+    if (!(await this.eventsService.deleteEvent(dto))) {
+      throw new HttpException('Delete failed', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }
