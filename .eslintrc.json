@@ -13,6 +13,7 @@
   "extends": ["standard-with-typescript", "prettier"],
   "overrides": [],
   "rules": {
-    "prettier/prettier": "error"
+    "prettier/prettier": "error",
+    "@typescript-eslint/consistent-type-imports": "off"
   }
 }
