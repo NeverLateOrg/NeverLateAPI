@@ -24,8 +24,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-      - run: npm run prepare
       - run: npm ci
+      - run: npm run prepare
       - run: npm run lint
   build:
     runs-on: ubuntu-latest
@@ -41,8 +41,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-      - run: npm run prepare
       - run: npm ci
+      - run: npm run prepare
       - run: npm run build
   test:
     runs-on: ubuntu-latest
@@ -59,8 +59,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-      - run: npm run prepare
       - run: npm ci
+      - run: npm run prepare
       - run: npm run build
       - run: npm run test
   e2eTest:
@@ -78,6 +78,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-      - run: npm run prepare
       - run: npm ci
+      - run: npm run prepare
       - run: npm run build
