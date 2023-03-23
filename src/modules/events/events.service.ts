@@ -25,9 +25,10 @@ export class EventsService {
   }
 
   public async updateEvent(updateEventDTO: UpdateEventDTO): Promise<ResponseEventDTO> {
-    const updatedEvent = await this.EventModel.findOneAndUpdate({ _id: updateEventDTO._id }, updateEventDTO, {
-      new: true,
-    });
+    const filter = { _id: updateEventDTO._id };
+    const returnUpdated = { new: true };
+    // findOneAndUpdate returns the updated document thanks to returnUpdated
+    const updatedEvent = await this.EventModel.findOneAndUpdate(filter, updateEventDTO, returnUpdated);
     if (updatedEvent == null) {
       throw new NotFoundException(`document with _id ${updateEventDTO._id} not found`);
     }
