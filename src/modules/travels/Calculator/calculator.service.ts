@@ -5,7 +5,7 @@ import DefaultTravelCalculator from './DefaultTravelCalculator';
 import ITravelCalculator, { Location, Travel } from './ITravelCalculator';
 
 @Injectable()
-export class CalculatorService {
+export class TravelsCalculatorService {
   private readonly _calculators: ITravelCalculator[] = [new DefaultTravelCalculator()];
 
   private getCalculator(type: string): ITravelCalculator | undefined {
