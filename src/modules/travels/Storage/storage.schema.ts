@@ -1,0 +1,25 @@
+/* eslint-disable @typescript-eslint/consistent-type-imports */
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
+import { Event } from 'src/modules/events/schemas/event.schema';
+
+export type TravelsDocument = HydratedDocument<Travels>;
+
+@Schema()
+class Travel {
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Event.name })
+  fromEvent: Event;
+}
+
+const TravelSchema = SchemaFactory.createForClass(Travel);
+
+@Schema()
+export class Travels {
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Event.name, unique: true })
+  destinationEvent: Event;
+
+  @Prop({ type: [TravelSchema] })
+  travels: Travel[];
+}
+
+export const TravelsSchema = SchemaFactory.createForClass(Travels);
