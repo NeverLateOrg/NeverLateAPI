@@ -1,18 +1,3 @@
-import { Type } from 'class-transformer';
-import { IsDate, IsNotEmpty, IsString } from 'class-validator';
+import { EventDTO } from './event.dto';
 
-export class ResponseEventDTO {
-  public _id: string;
-
-  @IsString()
-  @IsNotEmpty()
-  public name: string;
-
-  @IsDate()
-  @Type(() => Date)
-  public start_date: Date;
-
-  @IsDate()
-  @Type(() => Date)
-  public end_date: Date;
-}
+export class ResponseEventDTO extends EventDTO {}

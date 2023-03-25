@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateEventDTO, ResponseEventDTO, DeleteEventDTO, UpdateEventDTO } from './dto';
+import { CreateEventDTO, ResponseEventDTO, DeleteEventDTO, UpdateEventDTO } from '../eventsManager/dto';
 import { Event, EventDocument } from './schemas/event.schema';
 
 @Injectable()
@@ -33,5 +33,11 @@ export class EventsService {
       throw new NotFoundException(`document with _id ${updateEventDTO._id} not found`);
     }
     return updatedEvent;
+  }
+
+  // TODO
+  public async findEventsWithFilter(userId: string, filter: any): Promise<ResponseEventDTO[]> {
+    const foundEvents: ResponseEventDTO[] = [];
+    return foundEvents;
   }
 }

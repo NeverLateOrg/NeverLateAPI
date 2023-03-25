@@ -12,4 +12,9 @@ export class UsersService {
     await user.save();
     return 'new user created';
   }
+
+  public async addEventToUser(userId: string, eventId: string): Promise<boolean> {
+    // TODO: add eventId to the user's events
+    return true;
+  }
 }
