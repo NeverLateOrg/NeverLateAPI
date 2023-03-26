@@ -13,6 +13,9 @@ export class Event {
 
   @Prop({ type: Date, required: true })
   end_date: Date;
+
+  @Prop({ type: String, required: false })
+  location: string;
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event);

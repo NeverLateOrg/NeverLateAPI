@@ -17,4 +17,7 @@ export class EventDTO {
   @IsDate()
   @Type(() => Date)
   public end_date: Date;
+
+  @IsString()
+  public location: string;
 }
