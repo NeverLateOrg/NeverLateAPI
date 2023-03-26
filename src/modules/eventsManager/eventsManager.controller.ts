@@ -15,11 +15,13 @@ export class EventsManagerController {
 
   @Get()
   public async getAllEvents(): Promise<ResponseEventDTO[]> {
+    // TODO: handle errors
     return await this.service.getUserEvents(defaultUserId);
   }
 
   @Delete()
   public async deleteEvent(@Body() deleteEventDTO: DeleteEventDTO): Promise<void> {
+    // TODO: distinguish error from invalid id from other errors
     if (!(await this.service.deleteEvent(defaultUserId, deleteEventDTO))) {
       throw new HttpException('Delete failed', HttpStatus.INTERNAL_SERVER_ERROR);
     }

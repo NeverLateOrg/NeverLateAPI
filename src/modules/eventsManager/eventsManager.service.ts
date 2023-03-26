@@ -14,16 +14,17 @@ export class EventsManagerService {
   }
 
   public async updateEvent(updateEventDTO: UpdateEventDTO): Promise<ResponseEventDTO> {
-    return new ResponseEventDTO();
+    return await this.eventsService.updateEvent(updateEventDTO);
   }
 
   public async getUserEvents(userId: string): Promise<ResponseEventDTO[]> {
-    const events: ResponseEventDTO[] = [];
-    return events;
+    return await this.usersService.getEvents(userId);
   }
 
   public async deleteEvent(userId: string, deleteEventDTO: DeleteEventDTO): Promise<boolean> {
-    return false;
+    const eventSuccess = await this.eventsService.deleteEvent(deleteEventDTO);
+    const userSuccess = await this.usersService.deleteEvent(userId, deleteEventDTO._id);
+    return eventSuccess && userSuccess;
   }
 
   public async getNextEvents(userId: string, eventId: string): Promise<ResponseEventDTO[]> {
