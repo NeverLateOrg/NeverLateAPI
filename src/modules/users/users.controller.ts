@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import {Body, Controller, Get, HttpException, HttpStatus, Post, Res} from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Post, Res } from '@nestjs/common';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -10,10 +10,8 @@ export class UsersController {
   async createUser(@Body() user: any, @Res() res): Promise<void> {
     const result = await this.usersService.createUser(user.firstname, user.lastname, user.email, user.password);
 
-    if (result.includes("db"))
-      res.status(409).send(result);
-    else
-      res.status(201).send(result);
+    if (result.includes('db')) res.status(409).send(result);
+    else res.status(201).send(result);
   }
 
   @Get()
@@ -24,7 +22,7 @@ export class UsersController {
   }
 
   @Post('login')
-  async loginUser(@Body() body: { email: string, password: string }): Promise<{ message: string; user: any }> {
+  async loginUser(@Body() body: { email: string; password: string }): Promise<{ message: string; user: any }> {
     const user = await this.usersService.loginUser(body.email, body.password);
     if (user == null) {
       throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
