@@ -1,6 +1,8 @@
 import { Type } from 'class-transformer';
 import { IsDate, IsNotEmpty, IsString } from 'class-validator';
 
+// This is the default Event DTO
+// It must only be used as a base class for other DTOs
 export class EventDTO {
   public _id: string;
 
@@ -15,4 +17,7 @@ export class EventDTO {
   @IsDate()
   @Type(() => Date)
   public end_date: Date;
+
+  @IsString()
+  public location: string;
 }
