@@ -57,23 +57,23 @@ export class UsersService {
     return true;
   }
 
-  public async findNextEvent(userId: string, eventId: string): Promise<ResponseEventDTO> {
-    // const aggregate = Model.aggregate([
-    //   {
-    //     $match: {_id: userId}
-    //   }, {
-    //     $lookup: {
-    //       from: 'events',
-    //       localField: 'events',
-    //       foreignField: '_id',
-    //       as: 'events'
-    //     }
-    //   }, {
-    //     $sort: {}
-    //   }
+  public async findNextEvent(userId: string, endDate: Date): Promise<ResponseEventDTO | null> {
+    const events = await this.getEvents(userId);
+    events.sort((a, b) => a.start_date.getTime() - b.start_date.getTime());
+    const index = events.findIndex((event) => event.start_date >= endDate);
+    if (index === -1) {
+      return null;
+    }
+    return events[index];
+  }
 
-    // ])
-    // this.UserModel.aggregate(pipeline))
-    return new ResponseEventDTO();
+  public async findPreviousEvent(userId: string, startDate: Date): Promise<ResponseEventDTO | null> {
+    const events = await this.getEvents(userId);
+    events.sort((a, b) => b.end_date.getTime() - a.end_date.getTime());
+    const index = events.findIndex((event) => event.end_date <= startDate);
+    if (index === -1) {
+      return null;
+    }
+    return events[index];
   }
 }

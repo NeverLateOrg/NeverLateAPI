@@ -12,7 +12,7 @@ export class EventsService {
     return await this.EventModel.create(createEventDTO);
   }
 
-  public async findAllEvents(): Promise<ResponseEventDTO[]> {
+  public async getAllEvents(): Promise<ResponseEventDTO[]> {
     return await this.EventModel.find().exec();
   }
 
@@ -35,9 +35,13 @@ export class EventsService {
     return updatedEvent;
   }
 
-  // TODO
+  // TODO: Could be useful
   public async findEventsWithFilter(userId: string, filter: any): Promise<ResponseEventDTO[]> {
     const foundEvents: ResponseEventDTO[] = [];
     return foundEvents;
+  }
+
+  public async getEvent(eventId: string): Promise<ResponseEventDTO | null> {
+    return await this.EventModel.findById(eventId);
   }
 }
