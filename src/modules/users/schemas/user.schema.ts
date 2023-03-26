@@ -12,7 +12,7 @@ export class User {
   @Prop({ type: String, required: true })
   name: string;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: Event }], required: true })
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: () => Event }], required: true })
   events: string[];
 }
 
