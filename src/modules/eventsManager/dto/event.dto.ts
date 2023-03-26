@@ -19,5 +19,5 @@ export class EventDTO {
   public end_date: Date;
 
   @IsString()
-  public location: string;
+  public location?: string;
 }
