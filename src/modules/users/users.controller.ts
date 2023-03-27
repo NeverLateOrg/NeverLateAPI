@@ -1,6 +1,11 @@
 /* eslint-disable prettier/prettier */
 import { Body, Controller, Get, HttpException, HttpStatus, Post, Res } from '@nestjs/common';
 import { UsersService } from './users.service';
+import * as jwt from 'jsonwebtoken';
+
+import * as dotenv from 'dotenv';
+dotenv.config();
+const secretKey = process.env.JTW_SECRET_KEY;
 
 @Controller('users')
 export class UsersController {
@@ -22,11 +27,12 @@ export class UsersController {
   }
 
   @Post('login')
-  async loginUser(@Body() body: { email: string; password: string }): Promise<{ message: string; user: any }> {
+  async loginUser(
+    @Body() body: { email: string; password: string },
+  ): Promise<{ message: string; user: any; token: any }> {
     const user = await this.usersService.loginUser(body.email, body.password);
-    if (user == null) {
-      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
-    }
-    return { message: 'Logged in successfully', user };
+    if (user == null) throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+    const token = jwt.sign({ email: user.email }, secretKey, { expiresIn: '48h' });
+    return { message: 'Logged in successfully', user, token };
   }
 }
