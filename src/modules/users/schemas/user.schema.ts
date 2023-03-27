@@ -5,6 +5,7 @@ export const UserSchema = new mongoose.Schema({
   lastname: String,
   firstname: String,
   password: String,
+  token: String,
 });
 
 export interface User {
@@ -13,4 +14,5 @@ export interface User {
   lastname: string;
   firstname: string;
   password: string;
+  token: string;
 }

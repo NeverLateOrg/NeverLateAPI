@@ -15,14 +15,14 @@ export class UsersController {
   async createUser(@Body() user: any, @Res() res): Promise<void> {
     const result = await this.usersService.createUser(user.firstname, user.lastname, user.email, user.password);
 
-    if (result.includes('db')) res.status(409).send(result);
+    if (result === null) res.status(409).send(result);
     else res.status(201).send(result);
   }
 
   @Get()
   async getUser(@Body() user: any, @Res() res): Promise<void> {
     const result = await this.usersService.getUser(user.email);
-    if (result.includes('not found')) res.status(404).send(result);
+    if (result === null) res.status(404).send(result);
     res.status(200).send(result);
   }
 
@@ -33,6 +33,7 @@ export class UsersController {
     const user = await this.usersService.loginUser(body.email, body.password);
     if (user == null) throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
     const token = jwt.sign({ email: user.email }, secretKey, { expiresIn: '48h' });
+    user.token = token;
     return { message: 'Logged in successfully', user, token };
   }
 }

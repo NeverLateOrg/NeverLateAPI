@@ -8,23 +8,23 @@ import * as bcrypt from 'bcrypt';
 export class UsersService {
   constructor(@InjectModel('User') private readonly UserModel: Model<User>) {}
 
-  async createUser(firstname: string, lastname: string, email: string, password: string): Promise<string> {
+  async createUser(firstname: string, lastname: string, email: string, password: string): Promise<string | null> {
     let found = await this.getUser(email);
     found = String(found);
     if (!found.includes('not found')) {
-      return 'user already present in db';
+      return null;
     }
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    const user = new this.UserModel({ firstname, lastname, email, password: hashedPassword });
+    const user = new this.UserModel({ firstname, lastname, email: email.toLowerCase(), password: hashedPassword });
     await user.save();
     return 'new user created';
   }
 
-  async getUser(email: string): Promise<string> {
+  async getUser(email: string): Promise<string | null> {
     const user = await this.UserModel.findOne({ email }).exec();
     if (user != null) return user.email;
-    return 'user `' + email + '` not found';
+    return null;
   }
 
   async loginUser(email: string, password: string): Promise<User | null> {
