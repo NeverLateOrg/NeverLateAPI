@@ -6,11 +6,17 @@ export type EventDocument = Event & Document;
 
 @Schema()
 export class Event {
+  constructor(data: Partial<Event>) {
+    Object.assign(this, data);
+  }
+
+  id: string;
+
   @Prop({ type: String, required: true })
   name: string;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
-  user: Event;
+  user: User;
 
   @Prop({ type: Date, required: true })
   start_date: Date;

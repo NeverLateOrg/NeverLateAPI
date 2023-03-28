@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
-import { Client, Status, TrafficModel, TravelMode, UnitSystem } from '@googlemaps/google-maps-services-js';
+import { Client, Status, TravelMode, UnitSystem } from '@googlemaps/google-maps-services-js';
 import { Event } from 'src/modules/events/schemas/event.schema';
 import { Travel } from '../Storage/storage.schema';
 import ITravelCalculator from './ITravelCalculator';
@@ -18,8 +18,6 @@ export default class GoogleTravelCalculator implements ITravelCalculator {
         destination: to.location ?? '',
         mode: TravelMode.driving,
         units: UnitSystem.metric,
-        traffic_model: TrafficModel.best_guess,
-        arrival_time: to.start_date,
         key: this.GOOGLE_API_KEY,
       },
     });
