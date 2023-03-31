@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { Event } from '../events/event.schema';
 import { EventsService } from '../events/events.service';
-import { Event } from '../events/schemas/event.schema';
 import { TravelsStorageService } from '../travels/Storage/storage.service';
-import { User } from '../users/schemas/user.schema';
+import { User } from '../users/user.schema';
 import { UsersService } from '../users/users.service';
-import { CreateEventDTO, DeleteEventDTO, UpdateEventDTO } from './dto';
+import { CreateEventDTO, UpdateEventDTO } from './dtos';
 
 @Injectable()
 export class EventsManagerService {
@@ -32,8 +32,8 @@ export class EventsManagerService {
     return await this.eventsService.getUserEvents(user);
   }
 
-  public async deleteEvent(deleteEventDTO: DeleteEventDTO): Promise<boolean> {
-    const eventSuccess = await this.eventsService.deleteEvent(deleteEventDTO._id);
+  public async deleteEvent(eventId: string): Promise<boolean> {
+    const eventSuccess = await this.eventsService.deleteEvent(eventId);
     return eventSuccess;
   }
 }

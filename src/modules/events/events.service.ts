@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateEventDTO, UpdateEventDTO } from '../eventsManager/dto';
-import { User } from '../users/schemas/user.schema';
-import { Event, EventDocument } from './schemas/event.schema';
+import { CreateEventDTO, UpdateEventDTO } from '../eventsManager/dtos';
+import { User } from '../users/user.schema';
+import { Event, EventDocument } from './event.schema';
 
 @Injectable()
 export class EventsService {
