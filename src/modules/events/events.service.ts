@@ -15,7 +15,7 @@ export class EventsService {
   }
 
   public async getUserEvents(user: User): Promise<Event[]> {
-    const events = await this.EventModel.find({ user });
+    const events = await this.EventModel.find({ user: user.id });
     return events;
   }
 
