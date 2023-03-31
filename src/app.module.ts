@@ -8,7 +8,7 @@ import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://root:12341234@localhost/neverlate?authSource=admin'),
+    MongooseModule.forRoot(process.env.MONGO_URI ?? 'mongodb://root:12341234@localhost/neverlate?authSource=admin'),
     AuthModule,
     UsersModule,
     EventsModule,
