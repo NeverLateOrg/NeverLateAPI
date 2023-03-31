@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
-import { Event } from 'src/modules/events/schemas/event.schema';
+import { Event } from 'src/modules/events/event.schema';
 import { Travel } from '../Storage/storage.schema';
 import ITravelCalculator from './ITravelCalculator';
 

@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { EventsService } from 'src/modules/events/events.service';
-import { Event } from '../../events/schemas/event.schema';
+import { Event } from '../../events/event.schema';
 import { TravelsCalculatorService } from '../Calculator/calculator.service';
 import { Travel, Travels, TravelsDocument } from './storage.schema';
 
