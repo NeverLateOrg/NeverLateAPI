@@ -1,10 +1,7 @@
-export type Location = string;
-export interface Travel {
-  time: number;
-  distance: number;
-}
+import { Event } from 'src/modules/events/schemas/event.schema';
+import { Travel } from '../Storage/storage.schema';
 
 export default interface ITravelCalculator {
   type: string;
-  travelBetween: (from: Location, to: Location) => Travel;
+  travelBetween: (from: Event, to: Event) => Promise<Travel | null>;
 }

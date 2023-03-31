@@ -6,9 +6,12 @@ import { Event } from 'src/modules/events/schemas/event.schema';
 export type TravelsDocument = HydratedDocument<Travels>;
 
 @Schema()
-class Travel {
+export class Travel {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Event.name })
   fromEvent: Event;
+
+  @Prop({ type: Number, required: true })
+  duration: number;
 }
 
 const TravelSchema = SchemaFactory.createForClass(Travel);

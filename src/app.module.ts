@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { EventsModule } from './modules/events/events.module';
 import { TravelsModule } from './modules/travels/travels.module';
+import { EventsManagerModule } from './modules/eventsManager/events.Manager.module';
 import { UsersModule } from './modules/users/users.module';
 
 @Module({
@@ -10,6 +11,7 @@ import { UsersModule } from './modules/users/users.module';
     UsersModule,
     EventsModule,
     TravelsModule,
+    EventsManagerModule,
   ],
 })
 export class AppModule {}
