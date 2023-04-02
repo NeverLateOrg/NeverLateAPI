@@ -13,7 +13,13 @@ export class UserDTO {
   @Expose()
   @IsString()
   @IsNotEmpty()
-  public name: string;
+  public firstname: string;
+
+  @ApiProperty()
+  @Expose()
+  @IsString()
+  @IsNotEmpty()
+  public lastname: string;
 
   @ApiProperty()
   @Expose()
