@@ -15,6 +15,11 @@ export class AuthService {
   constructor(@InjectModel('User') private readonly userModel: Model<UserDocument>, private readonly jwt: JwtService) {}
 
   async register(registerDTO: RegisterDTO): Promise<string> {
+    const email = registerDTO.email;
+    const toto = await this.userModel.findOne({ email }).exec();
+
+    if (toto != null) throw new ForbiddenException('Email already used.');
+
     const hashedPassword = await argon.hash(registerDTO.password);
     // eslint-disable-next-line no-useless-catch
     try {
