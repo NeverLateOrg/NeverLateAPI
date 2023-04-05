@@ -11,7 +11,6 @@ async function bootstrap(): Promise<void> {
     .setTitle('NeverLate API')
     .setDescription('Neverlate calendar application API')
     .setVersion('0.1')
-    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
