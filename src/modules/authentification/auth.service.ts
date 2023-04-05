@@ -1,10 +1,9 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { User, UserDocument } from '../users/user.schema';
+import { UserDocument } from '../users/user.schema';
 import * as argon from 'argon2';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
 import { RegisterDTO } from './dtos/register.dto';
 import { LoginDTO } from './dtos/login.dto';
 import * as dotenv from 'dotenv';
