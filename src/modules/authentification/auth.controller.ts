@@ -26,7 +26,9 @@ export class AuthController {
   })
   @Post('register')
   public async register(@Body() registerDto: RegisterDTO): Promise<TokenDTO> {
-    return await this.authService.register(RegisterDTO);
+    const token = new TokenDTO();
+    token.access_token = await this.authService.register(registerDto);
+    return token;
   }
 
   @Post('login')
@@ -38,7 +40,8 @@ export class AuthController {
     description: 'Invalid credentials',
   })
   public async login(@Body() registerDto: LoginDTO): Promise<TokenDTO> {
-    const result = await this.authService.login(LoginDTO);
-    return result;
+    const token = new TokenDTO();
+    token.access_token = await this.authService.register(registerDto);
+    return token;
   }
 }
