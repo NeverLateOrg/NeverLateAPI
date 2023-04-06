@@ -30,8 +30,9 @@ export class UsersController {
   @ApiBadRequestResponse({
     description: 'Invalid request payload',
   })
+  @UseGuards(JwtGuard)
   @Put('me')
-  public async updateMe(@Body() updateUserDto: UpdateUserDTO): Promise<UserDTO> {
-    return new UserDTO();
+  public async updateMe(@GetUser() user: User, @Body() updateUserDto: UpdateUserDTO): Promise<UserDTO> {
+    return toDTO(UserDTO, user);
   }
 }
