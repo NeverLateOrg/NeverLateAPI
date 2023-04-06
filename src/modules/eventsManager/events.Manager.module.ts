@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { EventsModule } from '../events/events.module';
 import { TravelsStorageModule } from '../travels/Storage/storage.module';
 import { UsersModule } from '../users/users.module';
 import { EventsManagerController } from './eventsManager.controller';
 import { EventsManagerService } from './eventsManager.service';
+import { ValidateEventIdMiddleware } from './middleware/validateEventId.middleware';
 
 @Module({
   imports: [UsersModule, EventsModule, TravelsStorageModule],
@@ -11,4 +12,8 @@ import { EventsManagerService } from './eventsManager.service';
   controllers: [EventsManagerController],
   exports: [],
 })
-export class EventsManagerModule {}
+export class EventsManagerModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(ValidateEventIdMiddleware).forRoutes('events/:eventId');
+  }
+}
