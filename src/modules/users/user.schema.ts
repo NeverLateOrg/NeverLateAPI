@@ -22,6 +22,10 @@ export class User {
 
   @Prop({ type: String, required: true })
   passwordHash: string;
+
+  is(user: User): boolean {
+    return this._id === user._id;
+  }
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

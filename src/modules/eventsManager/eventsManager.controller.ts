@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, UseGuards } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -10,13 +10,14 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import toDTO from 'src/utils/dtoConvertor';
+import { GetUser } from '../authentification/decorator';
+import { JwtGuard } from '../authentification/guard';
 import { User } from '../users/user.schema';
 import { CreateEventDTO, ResponseEventDTO, UpdateEventDTO } from './dtos';
 import { EventsManagerService } from './eventsManager.service';
 
-const defaultUser: User = new User({ _id: '6421b003540da20b8a509cc3', email: 'pierre@gmail.com', firstName: 'Pierre' });
-
 @ApiTags('Events')
+@ApiBearerAuth()
 @Controller('/events')
 export class EventsManagerController {
   constructor(private readonly service: EventsManagerService) {}
@@ -32,9 +33,10 @@ export class EventsManagerController {
   @ApiUnauthorizedResponse({
     description: 'Unauthorized',
   })
+  @UseGuards(JwtGuard)
   @Post()
-  public async createEvent(@Body() createEventDTO: CreateEventDTO): Promise<ResponseEventDTO> {
-    const event = await this.service.createEvent(defaultUser, createEventDTO);
+  public async createEvent(@GetUser() user: User, @Body() createEventDTO: CreateEventDTO): Promise<ResponseEventDTO> {
+    const event = await this.service.createEvent(user, createEventDTO);
     const dto = toDTO(ResponseEventDTO, event);
     return dto;
   }
@@ -47,9 +49,10 @@ export class EventsManagerController {
   @ApiUnauthorizedResponse({
     description: 'Unauthorized',
   })
+  @UseGuards(JwtGuard)
   @Get()
-  public async getAllEvents(): Promise<ResponseEventDTO[]> {
-    const events = await this.service.getUserEvents(defaultUser);
+  public async getAllEvents(@GetUser() user: User): Promise<ResponseEventDTO[]> {
+    const events = await this.service.getUserEvents(user);
     return events.map((event) => toDTO(ResponseEventDTO, event));
   }
 
@@ -64,9 +67,14 @@ export class EventsManagerController {
   @ApiUnauthorizedResponse({
     description: 'Unauthorized',
   })
+  @UseGuards(JwtGuard)
   @Get(':eventId')
-  public async getEvent(@Param('eventId') eventId: string): Promise<ResponseEventDTO> {
-    return new ResponseEventDTO();
+  public async getEvent(@GetUser() user: User, @Param('eventId') eventId: string): Promise<ResponseEventDTO> {
+    const event = await this.service.getUserEvent(user, eventId);
+    if (event === null) {
+      throw new NotFoundException();
+    }
+    return toDTO(ResponseEventDTO, event);
   }
 
   @ApiBearerAuth()
@@ -79,10 +87,12 @@ export class EventsManagerController {
   @ApiUnauthorizedResponse({
     description: 'Unauthorized',
   })
+  @UseGuards(JwtGuard)
   @Delete(':eventId')
-  public async deleteEvent(@Param('eventId') eventId: string): Promise<void> {
-    if (!(await this.service.deleteEvent(eventId))) {
-      throw new HttpException('Delete failed', HttpStatus.INTERNAL_SERVER_ERROR);
+  public async deleteEvent(@GetUser() user: User, @Param('eventId') eventId: string): Promise<void> {
+    const success = await this.service.deleteEvent(user, eventId);
+    if (!success) {
+      throw new NotFoundException('Event not found. Please check the eventId parameter.');
     }
   }
 
@@ -97,16 +107,14 @@ export class EventsManagerController {
   @ApiUnauthorizedResponse({
     description: 'Unauthorized',
   })
+  @UseGuards(JwtGuard)
   @Put(':eventId')
   public async updateEvent(
+    @GetUser() user: User,
     @Param('eventId') eventId: string,
     @Body() updateEventDTO: UpdateEventDTO,
   ): Promise<ResponseEventDTO> {
-    try {
-      const event = await this.service.updateEvent(updateEventDTO);
-      return toDTO(ResponseEventDTO, event);
-    } catch (e) {
-      throw new HttpException(e, HttpStatus.NOT_FOUND);
-    }
+    const event = await this.service.updateEvent(user, eventId, updateEventDTO);
+    return toDTO(ResponseEventDTO, event);
   }
 }

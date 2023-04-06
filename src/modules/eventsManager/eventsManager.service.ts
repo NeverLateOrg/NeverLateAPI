@@ -3,7 +3,6 @@ import { Event } from '../events/event.schema';
 import { EventsService } from '../events/events.service';
 import { TravelsStorageService } from '../travels/Storage/storage.service';
 import { User } from '../users/user.schema';
-import { UsersService } from '../users/users.service';
 import { CreateEventDTO, UpdateEventDTO } from './dtos';
 
 @Injectable()
@@ -11,29 +10,39 @@ export class EventsManagerService {
   @Inject(EventsService)
   private readonly eventsService: EventsService;
 
-  @Inject(UsersService)
-  private readonly usersService: UsersService;
-
   @Inject(TravelsStorageService)
   private readonly travelStorageService: TravelsStorageService;
 
   public async createEvent(user: User, createEventDTO: CreateEventDTO): Promise<Event> {
     const createdEvent = await this.eventsService.createEvent(user, createEventDTO);
-    await this.travelStorageService.handleTravels(createdEvent);
-    console.log(`event id = ${createdEvent.id}`);
+    await this.travelStorageService.handleNewTravels(createdEvent);
     return createdEvent;
   }
 
-  public async updateEvent(updateEventDTO: UpdateEventDTO): Promise<Event> {
-    return await this.eventsService.updateEvent(updateEventDTO);
+  public async updateEvent(user: User, eventId: string, updateEventDTO: UpdateEventDTO): Promise<Event> {
+    const event = await this.eventsService.updateEvent(user, eventId, updateEventDTO);
+    await this.travelStorageService.handleUpdateTravels(event);
+    return event;
   }
 
   public async getUserEvents(user: User): Promise<Event[]> {
     return await this.eventsService.getUserEvents(user);
   }
 
-  public async deleteEvent(eventId: string): Promise<boolean> {
-    const eventSuccess = await this.eventsService.deleteEvent(eventId);
-    return eventSuccess;
+  public async getUserEvent(user: User, eventId: string): Promise<Event | null> {
+    return await this.eventsService.getUserEvent(user, eventId);
+  }
+
+  /**
+   * Delete an event and update the travel associated to it if needed (if the event is the last one of the travel)
+   */
+  public async deleteEvent(user: User, eventId: string): Promise<boolean> {
+    const event = await this.eventsService.getUserEvent(user, eventId);
+    if (event == null) {
+      return false;
+    }
+    await event.delete();
+    await this.travelStorageService.handleDeleteTravels(event);
+    return true;
   }
 }
