@@ -1,12 +1,12 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { UserDocument } from '../users/user.schema';
-import * as argon from 'argon2';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
-import { RegisterDTO } from './dtos/register.dto';
-import { LoginDTO } from './dtos/login.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import * as argon from 'argon2';
 import * as dotenv from 'dotenv';
+import { Model } from 'mongoose';
+import { UserDocument } from '../users/user.schema';
+import { LoginDTO } from './dtos/login.dto';
+import { RegisterDTO } from './dtos/register.dto';
 
 dotenv.config();
 
@@ -26,11 +26,10 @@ export class AuthService {
       // eslint-disable-next-line new-cap
       const newUser = new this.userModel({
         email: registerDTO.email.toLowerCase(),
-        firstname: registerDTO.firstname,
-        lastname: registerDTO.lastname,
+        firstName: registerDTO.firstName,
+        lastName: registerDTO.lastName,
         passwordHash: hashedPassword,
       });
-      console.log(newUser.email);
       await newUser.save();
 
       return await this.signToken(newUser.id, newUser.email);

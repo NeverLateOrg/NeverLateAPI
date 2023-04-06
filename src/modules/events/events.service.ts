@@ -10,12 +10,12 @@ export class EventsService {
   constructor(@InjectModel(Event.name) private readonly EventModel: Model<EventDocument>) {}
 
   public async createEvent(user: User, createEventDTO: CreateEventDTO): Promise<Event> {
-    const event = new this.EventModel({ ...createEventDTO, user: user.id });
+    const event = new this.EventModel({ ...createEventDTO, user: user._id });
     return await event.save();
   }
 
   public async getUserEvents(user: User): Promise<Event[]> {
-    const events = await this.EventModel.find({ user: user.id });
+    const events = await this.EventModel.find({ user: user._id });
     return events;
   }
 

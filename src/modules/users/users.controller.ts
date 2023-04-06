@@ -1,14 +1,16 @@
 import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import toDTO from 'src/utils/dtoConvertor';
+import { GetUser } from '../authentification/decorator/';
+import { JwtGuard } from '../authentification/guard';
 import { UpdateUserDTO } from './dtos/update-user.dto';
 import { UserDTO } from './dtos/user.dto';
-import { JwtGuard } from '../authentification/guard';
-import { GetUser } from '../authentification/decorator/';
+import { User } from './user.schema';
 
 @ApiTags('User')
+@ApiBearerAuth()
 @Controller('users')
 export class UsersController {
-  @ApiBearerAuth()
   @ApiOkResponse({
     description: 'Current user retrieved successfully',
     type: UserDTO,
@@ -16,11 +18,10 @@ export class UsersController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @UseGuards(JwtGuard)
   @Get('me')
-  async getMe(@GetUser() user: UserDTO): Promise<any> {
-    return user;
+  async getMe(@GetUser() user: User): Promise<UserDTO> {
+    return toDTO(UserDTO, user);
   }
 
-  @ApiBearerAuth()
   @ApiOkResponse({
     description: 'Current user updated successfully',
     type: UserDTO,
@@ -29,8 +30,9 @@ export class UsersController {
   @ApiBadRequestResponse({
     description: 'Invalid request payload',
   })
+  @UseGuards(JwtGuard)
   @Put('me')
-  public async updateMe(@Body() updateUserDto: UpdateUserDTO): Promise<UserDTO> {
-    return new UserDTO();
+  public async updateMe(@GetUser() user: User, @Body() updateUserDto: UpdateUserDTO): Promise<UserDTO> {
+    return toDTO(UserDTO, user);
   }
 }

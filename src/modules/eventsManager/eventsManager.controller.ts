@@ -14,7 +14,7 @@ import { User } from '../users/user.schema';
 import { CreateEventDTO, ResponseEventDTO, UpdateEventDTO } from './dtos';
 import { EventsManagerService } from './eventsManager.service';
 
-const defaultUser: User = new User({ id: '6421b003540da20b8a509cc3', email: 'pierre@gmail.com', firstname: 'Pierre' });
+const defaultUser: User = new User({ _id: '6421b003540da20b8a509cc3', email: 'pierre@gmail.com', firstName: 'Pierre' });
 
 @ApiTags('Events')
 @Controller('/events')
