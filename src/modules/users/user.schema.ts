@@ -5,8 +5,7 @@ export type UserDocument = User & mongoose.Document;
 
 @Schema()
 export class User {
-  @Prop({ unique: true })
-  id: string;
+  _id: string;
 
   constructor(data: Partial<User>) {
     Object.assign(this, data);
@@ -16,10 +15,10 @@ export class User {
   email: string;
 
   @Prop({ type: String, required: false })
-  firstname: string;
+  firstName: string;
 
   @Prop({ type: String, required: false })
-  lastname: string;
+  lastName: string;
 
   @Prop({ type: String, required: true })
   passwordHash: string;
