@@ -6,13 +6,17 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+
 import { LoginDTO } from './dtos/login.dto';
 import { RegisterDTO } from './dtos/register.dto';
 import { TokenDTO } from './dtos/token.dto';
+import { AuthService } from './auth.service';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
   @ApiCreatedResponse({
     description: 'User registered successfully and JWT token generated',
     type: TokenDTO,
@@ -22,7 +26,9 @@ export class AuthController {
   })
   @Post('register')
   public async register(@Body() registerDto: RegisterDTO): Promise<TokenDTO> {
-    return new TokenDTO();
+    const token = new TokenDTO();
+    token.access_token = await this.authService.register(registerDto);
+    return token;
   }
 
   @Post('login')
@@ -33,7 +39,9 @@ export class AuthController {
   @ApiUnauthorizedResponse({
     description: 'Invalid credentials',
   })
-  public async login(@Body() registerDto: LoginDTO): Promise<TokenDTO> {
-    return new TokenDTO();
+  public async login(@Body() loginDto: LoginDTO): Promise<TokenDTO> {
+    const token = new TokenDTO();
+    token.access_token = await this.authService.login(loginDto);
+    return token;
   }
 }

@@ -1,7 +1,9 @@
-import { Body, Controller, Get, Put } from '@nestjs/common';
+import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { UpdateUserDTO } from './dtos/update-user.dto';
 import { UserDTO } from './dtos/user.dto';
+import { JwtGuard } from '../authentification/guard';
+import { GetUser } from '../authentification/decorator/';
 
 @ApiTags('User')
 @Controller('users')
@@ -12,9 +14,10 @@ export class UsersController {
     type: UserDTO,
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @UseGuards(JwtGuard)
   @Get('me')
-  public async getMe(): Promise<UserDTO> {
-    return new UserDTO();
+  async getMe(@GetUser() user: UserDTO): Promise<any> {
+    return user;
   }
 
   @ApiBearerAuth()
