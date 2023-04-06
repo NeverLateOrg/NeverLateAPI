@@ -1,8 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
-import { EventDTO } from './event.dto';
 
-export class UpdateEventDTO extends EventDTO {
+export class UpdateEventDTO {
   @IsOptional()
   @ApiProperty({ required: false })
   public name: string;
