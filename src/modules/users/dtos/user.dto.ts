@@ -1,9 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { TransformObjectId } from 'src/utils/transformers';
 
 export class UserDTO {
   @Exclude()
+  @TransformObjectId()
   public _id: string;
 
   @Exclude()

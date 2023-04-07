@@ -10,7 +10,7 @@ export class Event {
     Object.assign(this, data);
   }
 
-  id: string;
+  _id: string;
 
   @Prop({ type: String, required: true })
   name: string;
