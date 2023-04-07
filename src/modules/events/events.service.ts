@@ -17,7 +17,7 @@ export class EventsService {
   public async findNextEvents(event: Event): Promise<Event[]> {
     const nextEvents = await this.EventModel.find({
       start_date: { $gte: event.end_date },
-      _id: { $ne: event.id }, // exclude the given event from the results
+      _id: { $ne: event._id }, // exclude the given event from the results
     })
       .sort({ start_date: 1 }) // sort by start date in ascending order
       .limit(1) // limit to the first result
@@ -28,7 +28,7 @@ export class EventsService {
   public async findPreviousEvents(event: Event): Promise<Event[]> {
     const previousEvents = await this.EventModel.find({
       end_date: { $lte: event.start_date },
-      _id: { $ne: event.id }, // exclude the given event from the results
+      _id: { $ne: event._id }, // exclude the given event from the results
     })
       .sort({ end_date: -1 }) // sort by start date in ascending order
       .limit(1) // limit to the first result
@@ -52,6 +52,7 @@ export class EventsService {
   }
 
   public async getUserEvent(user: User, eventId: string): Promise<EventDocument | null> {
+    console.log('user', user._id, 'event', eventId);
     return await this.EventModel.findOne({ user: user._id, _id: eventId });
   }
 }

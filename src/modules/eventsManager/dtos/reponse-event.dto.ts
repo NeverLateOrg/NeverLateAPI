@@ -1,10 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import { EventDTO } from './event.dto';
+import { TransformObjectId } from 'src/utils/transformers';
 
-export class ResponseEventDTO extends EventDTO {
+export class ResponseEventDTO {
   @Expose()
   @ApiProperty()
+  @TransformObjectId()
   public _id: string;
 
   @Expose()
