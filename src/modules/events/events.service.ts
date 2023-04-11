@@ -14,6 +14,19 @@ export class EventsService {
     return await event.save();
   }
 
+  public async getPreviousEventsOfEvent(event: Event): Promise<Event[]> {
+    try {
+      return await this.EventModel.find({
+        user: event.user,
+        end_date: { $lt: event.start_date },
+        _id: { $ne: event._id },
+      }).sort({ end_date: -1 });
+    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      throw new Error(`Error in getPreviousEventsOfEvent: ${error}`);
+    }
+  }
+
   public async findNextEvents(event: Event): Promise<Event[]> {
     const nextEvents = await this.EventModel.find({
       start_date: { $gte: event.end_date },
