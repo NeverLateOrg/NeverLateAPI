@@ -19,11 +19,24 @@ export class EventsService {
       return await this.EventModel.find({
         user: event.user,
         end_date: { $lt: event.start_date },
-        _id: { $ne: event._id },
+        _id: { $ne: event._id }, // does not include the event in parameter.
       }).sort({ end_date: -1 });
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       throw new Error(`Error in getPreviousEventsOfEvent: ${error}`);
+    }
+  }
+
+  public async getNextEventsOfEvent(event: Event): Promise<Event[]> {
+    try {
+      return await this.EventModel.find({
+        user: event.user,
+        start_date: { $gt: event.end_date },
+        _id: { $ne: event._id }, // does not include the event in parameter.
+      }).sort({ start_date: 1 });
+    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      throw new Error(`Error in getNextEventsOfEvent: ${error}`);
     }
   }
 
