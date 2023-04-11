@@ -40,6 +40,22 @@ export class EventsService {
     }
   }
 
+  public async getSimultaneousEventsOfEvent(event: Event): Promise<Event[]> {
+    try {
+      return await this.EventModel.find({
+        user: event.user,
+        $or: [
+          { start_date: { $lt: event.end_date }, end_date: { $gt: event.start_date } },
+          { start_date: { $gte: event.start_date }, end_date: { $lte: event.end_date } },
+        ],
+        _id: { $ne: event._id },
+      });
+    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      throw new Error(`Error in getSimultaneousEventsOfEvent: ${error}`);
+    }
+  }
+
   public async findNextEvents(event: Event): Promise<Event[]> {
     const nextEvents = await this.EventModel.find({
       start_date: { $gte: event.end_date },
