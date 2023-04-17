@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 import { Client, Status } from '@googlemaps/google-maps-services-js';
 import { Injectable } from '@nestjs/common';
-import { Event } from 'src/modules/events/event.schema';
+import { EventDocument } from 'src/modules/events/event.schema';
 
 @Injectable()
 export class LocationValidatorService {
@@ -10,7 +10,7 @@ export class LocationValidatorService {
   // temp hardcoded (will be change)
   private readonly GOOGLE_API_KEY = 'AIzaSyDMC_6DlM8RicLOfCH-7Zll1aZUqC5Ir8g';
 
-  public async format(event: Event): Promise<Event> {
+  public async format(event: EventDocument): Promise<EventDocument> {
     const response = await this.client.geocode({
       params: {
         address: event.location,

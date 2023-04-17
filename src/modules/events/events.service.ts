@@ -2,15 +2,20 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateEventDTO, UpdateEventDTO } from '../eventsManager/dtos';
+import { LocationValidatorService } from '../travels/locationFormator/formator.service';
 import { User } from '../users/user.schema';
 import { Event, EventDocument } from './event.schema';
 
 @Injectable()
 export class EventsService {
-  constructor(@InjectModel(Event.name) private readonly EventModel: Model<EventDocument>) {}
+  constructor(
+    @InjectModel(Event.name) private readonly EventModel: Model<EventDocument>,
+    private readonly locationValidatorService: LocationValidatorService,
+  ) {}
 
   public async createEvent(user: User, createEventDTO: CreateEventDTO): Promise<Event> {
-    const event = new this.EventModel({ ...createEventDTO, user: user._id });
+    let event = new this.EventModel({ ...createEventDTO, user: user._id });
+    event = await this.locationValidatorService.format(event);
     return await event.save();
   }
 
@@ -39,11 +44,12 @@ export class EventsService {
   public async updateEvent(user: User, eventId: string, updateEventDTO: UpdateEventDTO): Promise<Event> {
     const filter = { _id: eventId, user: user._id };
     const returnUpdated = { new: true };
-    const updatedEvent = await this.EventModel.findOneAndUpdate(filter, updateEventDTO, returnUpdated);
+    let updatedEvent = await this.EventModel.findOneAndUpdate(filter, updateEventDTO, returnUpdated);
     if (updatedEvent == null) {
       throw new NotFoundException('Event not found, or not owned by the user');
     }
-    return updatedEvent;
+    updatedEvent = await this.locationValidatorService.format(updatedEvent);
+    return await updatedEvent.save();
   }
 
   public async getUserEvents(user: User): Promise<Event[]> {

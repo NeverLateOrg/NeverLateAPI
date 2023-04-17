@@ -5,5 +5,6 @@ import { LocationValidatorService } from './formator.service';
   imports: [],
   providers: [LocationValidatorService],
   controllers: [],
+  exports: [LocationValidatorService],
 })
 export class LocationValidatorModule {}
