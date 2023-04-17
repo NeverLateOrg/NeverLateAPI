@@ -51,4 +51,8 @@ export class TravelsStorageService {
       // To be upgrade if there is at least another event at the same time
     }
   }
+
+  public async getTravelsOfEvent(event: Event): Promise<Travels | null> {
+    return await this.TravelsModel.findOne({ destinationEvent: event });
+  }
 }

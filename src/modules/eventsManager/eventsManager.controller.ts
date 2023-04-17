@@ -9,7 +9,6 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import toDTO from 'src/utils/dtoConvertor';
 import { User } from '../users/user.schema';
 import { CreateEventDTO, ResponseEventDTO, UpdateEventDTO } from './dtos';
 import { EventsManagerService } from './eventsManager.service';
@@ -34,8 +33,9 @@ export class EventsManagerController {
   })
   @Post()
   public async createEvent(@Body() createEventDTO: CreateEventDTO): Promise<ResponseEventDTO> {
-    const event = await this.service.createEvent(defaultUser, createEventDTO);
-    const dto = toDTO(ResponseEventDTO, event);
+    const { event, travels } = await this.service.createEvent(defaultUser, createEventDTO);
+    const dto = ResponseEventDTO.build(event, travels);
+    console.log(event, dto);
     return dto;
   }
 
@@ -50,7 +50,7 @@ export class EventsManagerController {
   @Get()
   public async getAllEvents(): Promise<ResponseEventDTO[]> {
     const events = await this.service.getUserEvents(defaultUser);
-    return events.map((event) => toDTO(ResponseEventDTO, event));
+    return events.map(({ event, travels }) => ResponseEventDTO.build(event, travels));
   }
 
   @ApiBearerAuth()
@@ -103,8 +103,8 @@ export class EventsManagerController {
     @Body() updateEventDTO: UpdateEventDTO,
   ): Promise<ResponseEventDTO> {
     try {
-      const event = await this.service.updateEvent(updateEventDTO);
-      return toDTO(ResponseEventDTO, event);
+      const { event, travels } = await this.service.updateEvent(updateEventDTO);
+      return ResponseEventDTO.build(event, travels);
     } catch (e) {
       throw new HttpException(e, HttpStatus.NOT_FOUND);
     }
