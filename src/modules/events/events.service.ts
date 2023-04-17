@@ -14,11 +14,6 @@ export class EventsService {
     return await event.save();
   }
 
-  public async getUserEvents(user: User): Promise<Event[]> {
-    const events = await this.EventModel.find({ user: user._id });
-    return events;
-  }
-
   public async findNextEvents(event: Event): Promise<Event[]> {
     const nextEvents = await this.EventModel.find({
       start_date: { $gte: event.end_date },
@@ -41,26 +36,22 @@ export class EventsService {
     return previousEvents;
   }
 
-  public async deleteEvent(eventId: string): Promise<boolean> {
-    await this.EventModel.findByIdAndDelete(eventId).catch(function (error) {
-      console.log(error);
-      return false;
-    });
-    return true;
-  }
-
-  public async updateEvent(updateEventDTO: UpdateEventDTO): Promise<Event> {
-    const filter = { _id: updateEventDTO._id };
+  public async updateEvent(user: User, eventId: string, updateEventDTO: UpdateEventDTO): Promise<Event> {
+    const filter = { _id: eventId, user: user._id };
     const returnUpdated = { new: true };
-    // findOneAndUpdate returns the updated document thanks to returnUpdated
     const updatedEvent = await this.EventModel.findOneAndUpdate(filter, updateEventDTO, returnUpdated);
     if (updatedEvent == null) {
-      throw new NotFoundException(`document with _id ${updateEventDTO._id} not found`);
+      throw new NotFoundException('Event not found, or not owned by the user');
     }
     return updatedEvent;
   }
 
-  public async getEvent(eventId: string): Promise<Event | null> {
-    return await this.EventModel.findById(eventId);
+  public async getUserEvents(user: User): Promise<Event[]> {
+    const events = await this.EventModel.find({ user: user._id });
+    return events;
+  }
+
+  public async getUserEvent(user: User, eventId: string): Promise<EventDocument | null> {
+    return await this.EventModel.findOne({ user: user._id, _id: eventId });
   }
 }

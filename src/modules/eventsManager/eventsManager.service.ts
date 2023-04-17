@@ -4,16 +4,12 @@ import { EventsService } from '../events/events.service';
 import { Travels } from '../travels/Storage/storage.schema';
 import { TravelsStorageService } from '../travels/Storage/storage.service';
 import { User } from '../users/user.schema';
-import { UsersService } from '../users/users.service';
 import { CreateEventDTO, UpdateEventDTO } from './dtos';
 
 @Injectable()
 export class EventsManagerService {
   @Inject(EventsService)
   private readonly eventsService: EventsService;
-
-  @Inject(UsersService)
-  private readonly usersService: UsersService;
 
   @Inject(TravelsStorageService)
   private readonly travelStorageService: TravelsStorageService;
@@ -23,15 +19,20 @@ export class EventsManagerService {
     createEventDTO: CreateEventDTO,
   ): Promise<{ event: Event; travels: Travels | null }> {
     const createdEvent = await this.eventsService.createEvent(user, createEventDTO);
-    await this.travelStorageService.handleTravels(createdEvent);
+    await this.travelStorageService.handleNewTravels(createdEvent);
     const travels = await this.travelStorageService.getTravelsOfEvent(createdEvent);
     return { event: createdEvent, travels };
   }
 
-  public async updateEvent(updateEventDTO: UpdateEventDTO): Promise<{ event: Event; travels: Travels | null }> {
-    const updatedEvent = await this.eventsService.updateEvent(updateEventDTO);
-    const travels = await this.travelStorageService.getTravelsOfEvent(updatedEvent);
-    return { event: updatedEvent, travels };
+  public async updateEvent(
+    user: User,
+    eventId: string,
+    updateEventDTO: UpdateEventDTO,
+  ): Promise<{ event: Event; travels: Travels | null }> {
+    const event = await this.eventsService.updateEvent(user, eventId, updateEventDTO);
+    await this.travelStorageService.handleUpdateTravels(event);
+    const travels = await this.travelStorageService.getTravelsOfEvent(event);
+    return { event, travels };
   }
 
   public async getUserEvents(user: User): Promise<Array<{ event: Event; travels: Travels | null }>> {
@@ -44,8 +45,20 @@ export class EventsManagerService {
     );
   }
 
-  public async deleteEvent(eventId: string): Promise<boolean> {
-    const eventSuccess = await this.eventsService.deleteEvent(eventId);
-    return eventSuccess;
+  public async getUserEvent(user: User, eventId: string): Promise<Event | null> {
+    return await this.eventsService.getUserEvent(user, eventId);
+  }
+
+  /**
+   * Delete an event and update the travel associated to it if needed (if the event is the last one of the travel)
+   */
+  public async deleteEvent(user: User, eventId: string): Promise<boolean> {
+    const event = await this.eventsService.getUserEvent(user, eventId);
+    if (event == null) {
+      return false;
+    }
+    await event.delete();
+    await this.travelStorageService.handleDeleteTravels(event);
+    return true;
   }
 }

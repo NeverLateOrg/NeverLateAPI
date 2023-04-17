@@ -38,7 +38,7 @@ export class TravelsStorageService {
     });
   }
 
-  public async handleTravels(event: Event): Promise<void> {
+  public async handleNewTravels(event: Event): Promise<void> {
     const nextEvents = await this.eventService.findNextEvents(event);
     const previousEvents = await this.eventService.findPreviousEvents(event);
 
@@ -50,6 +50,19 @@ export class TravelsStorageService {
       await this.setTravels(nextEvent, [event]);
       // To be upgrade if there is at least another event at the same time
     }
+    // TODO
+  }
+
+  public async handleDeleteTravels(event: Event): Promise<void> {
+    await this.deleteTravels(event);
+
+    // TODO
+  }
+
+  public async handleUpdateTravels(event: Event): Promise<void> {
+    // TODO optimize
+    await this.handleDeleteTravels(event);
+    await this.handleNewTravels(event);
   }
 
   public async getTravelsOfEvent(event: Event): Promise<Travels | null> {
