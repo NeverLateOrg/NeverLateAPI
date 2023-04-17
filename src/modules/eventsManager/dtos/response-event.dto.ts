@@ -1,24 +1,21 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import { Event } from 'src/modules/events/event.schema';
 import { Travels } from 'src/modules/travels/Storage/storage.schema';
-import { TravelDTO, TravelsDTO } from 'src/modules/travels/dtos/travels.dto';
-import { EventDTO } from './event.dto';
+import { TravelDTO } from 'src/modules/travels/dtos/travels.dto';
+import toDTO from 'src/utils/dtoConvertor';
+import { TransformObjectId } from 'src/utils/transformers';
 
-export class ResponseEventDTO extends EventDTO {
+export class ResponseEventDTO {
   public static build(event: Event, travels: Travels | null): ResponseEventDTO {
-    const dto = new ResponseEventDTO();
-    dto._id = event.id;
-    dto.name = event.name;
-    dto.start_date = event.start_date;
-    dto.end_date = event.end_date;
-    dto.location = event.location;
-    dto.travels = travels != null ? travels.travels.map(TravelDTO.build) : undefined;
-    return dto;
+    return toDTO(ResponseEventDTO, event, {
+      travels: travels === null ? [] : travels.travels.map((travel) => TravelDTO.build(travel)),
+    });
   }
 
   @Expose()
   @ApiProperty()
+  @TransformObjectId()
   public _id: string;
 
   @Expose()
@@ -38,6 +35,7 @@ export class ResponseEventDTO extends EventDTO {
   public location?: string;
 
   @Expose()
-  @ApiProperty({ required: false })
-  public travels?: TravelsDTO;
+  @ApiProperty({ required: false, type: [TravelDTO] })
+  @Type(() => TravelDTO)
+  public travels?: TravelDTO[];
 }

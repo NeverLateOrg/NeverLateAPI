@@ -45,8 +45,10 @@ export class EventsManagerService {
     );
   }
 
-  public async getUserEvent(user: User, eventId: string): Promise<Event | null> {
-    return await this.eventsService.getUserEvent(user, eventId);
+  public async getUserEvent(user: User, eventId: string): Promise<{ event: Event; travels: Travels | null } | null> {
+    const event = await this.eventsService.getUserEvent(user, eventId);
+    const travels = await this.travelStorageService.getTravelsOfEvent(event as Event);
+    return event != null ? { event, travels } : null;
   }
 
   /**

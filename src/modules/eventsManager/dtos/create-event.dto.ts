@@ -1,21 +1,24 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
-import { EventDTO } from './event.dto';
+import { Type } from 'class-transformer';
+import { IsDate, IsNotEmpty, IsString } from 'class-validator';
 
-export class CreateEventDTO extends EventDTO {
-  @Expose()
+export class CreateEventDTO {
   @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   public name: string;
 
-  @Expose()
   @ApiProperty()
+  @IsDate()
+  @Type(() => Date)
   public start_date: Date;
 
-  @Expose()
   @ApiProperty()
+  @IsDate()
+  @Type(() => Date)
   public end_date: Date;
 
-  @Expose()
+  @IsString()
   @ApiProperty({ required: false })
   public location?: string;
 }

@@ -21,7 +21,6 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import toDTO from 'src/utils/dtoConvertor';
 import { ObjectIdPipe } from 'src/utils/pipes';
 import { GetUser } from '../authentification/decorator';
 import { JwtGuard } from '../authentification/guard';
@@ -86,13 +85,11 @@ export class EventsManagerController {
     @GetUser() user: User,
     @Param('eventId', ObjectIdPipe) eventId: string,
   ): Promise<ResponseEventDTO> {
-    const event = await this.service.getUserEvent(user, eventId);
-    console.log(event?._id);
-    if (event === null) {
+    const data = await this.service.getUserEvent(user, eventId);
+    if (data === null) {
       throw new NotFoundException();
     }
-    console.log(toDTO(ResponseEventDTO, event));
-    return toDTO(ResponseEventDTO, event);
+    return ResponseEventDTO.build(data.event, data.travels);
   }
 
   @ApiBearerAuth()
