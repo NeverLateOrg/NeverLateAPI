@@ -1,10 +1,12 @@
 import { Exclude, Expose, Type } from 'class-transformer';
 import { IsDate, IsNotEmpty, IsString } from 'class-validator';
+import { TransformObjectId } from 'src/utils/transformers';
 
 // This is the default Event DTO
 // It must only be used as a base class for other DTOs
 export class EventDTO {
   @Expose()
+  @TransformObjectId()
   public _id: string;
 
   @Exclude()

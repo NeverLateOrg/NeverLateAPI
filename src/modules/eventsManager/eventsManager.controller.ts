@@ -22,6 +22,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import toDTO from 'src/utils/dtoConvertor';
+import { ObjectIdPipe } from 'src/utils/pipes';
 import { GetUser } from '../authentification/decorator';
 import { JwtGuard } from '../authentification/guard';
 import { User } from '../users/user.schema';
@@ -81,11 +82,16 @@ export class EventsManagerController {
   })
   @UseGuards(JwtGuard)
   @Get(':eventId')
-  public async getEvent(@GetUser() user: User, @Param('eventId') eventId: string): Promise<ResponseEventDTO> {
+  public async getEvent(
+    @GetUser() user: User,
+    @Param('eventId', ObjectIdPipe) eventId: string,
+  ): Promise<ResponseEventDTO> {
     const event = await this.service.getUserEvent(user, eventId);
+    console.log(event?._id);
     if (event === null) {
       throw new NotFoundException();
     }
+    console.log(toDTO(ResponseEventDTO, event));
     return toDTO(ResponseEventDTO, event);
   }
 
@@ -101,7 +107,7 @@ export class EventsManagerController {
   })
   @UseGuards(JwtGuard)
   @Delete(':eventId')
-  public async deleteEvent(@GetUser() user: User, @Param('eventId') eventId: string): Promise<void> {
+  public async deleteEvent(@GetUser() user: User, @Param('eventId', ObjectIdPipe) eventId: string): Promise<void> {
     const success = await this.service.deleteEvent(user, eventId);
     if (!success) {
       throw new NotFoundException('Event not found. Please check the eventId parameter.');
@@ -123,7 +129,7 @@ export class EventsManagerController {
   @Put(':eventId')
   public async updateEvent(
     @GetUser() user: User,
-    @Param('eventId') eventId: string,
+    @Param('eventId', ObjectIdPipe) eventId: string,
     @Body() updateEventDTO: UpdateEventDTO,
   ): Promise<ResponseEventDTO> {
     try {
