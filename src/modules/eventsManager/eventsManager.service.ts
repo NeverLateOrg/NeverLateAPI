@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Event } from '../events/event.schema';
 import { EventsService } from '../events/events.service';
+import { Travels } from '../travels/Storage/storage.schema';
 import { TravelsStorageService } from '../travels/Storage/storage.service';
 import { User } from '../users/user.schema';
 import { CreateEventDTO, UpdateEventDTO } from './dtos';
@@ -13,24 +14,41 @@ export class EventsManagerService {
   @Inject(TravelsStorageService)
   private readonly travelStorageService: TravelsStorageService;
 
-  public async createEvent(user: User, createEventDTO: CreateEventDTO): Promise<Event> {
+  public async createEvent(
+    user: User,
+    createEventDTO: CreateEventDTO,
+  ): Promise<{ event: Event; travels: Travels | null }> {
     const createdEvent = await this.eventsService.createEvent(user, createEventDTO);
     await this.travelStorageService.handleNewTravels(createdEvent);
-    return createdEvent;
+    const travels = await this.travelStorageService.getTravelsOfEvent(createdEvent);
+    return { event: createdEvent, travels };
   }
 
-  public async updateEvent(user: User, eventId: string, updateEventDTO: UpdateEventDTO): Promise<Event> {
+  public async updateEvent(
+    user: User,
+    eventId: string,
+    updateEventDTO: UpdateEventDTO,
+  ): Promise<{ event: Event; travels: Travels | null }> {
     const event = await this.eventsService.updateEvent(user, eventId, updateEventDTO);
     await this.travelStorageService.handleUpdateTravels(event);
-    return event;
+    const travels = await this.travelStorageService.getTravelsOfEvent(event);
+    return { event, travels };
   }
 
-  public async getUserEvents(user: User): Promise<Event[]> {
-    return await this.eventsService.getUserEvents(user);
+  public async getUserEvents(user: User): Promise<Array<{ event: Event; travels: Travels | null }>> {
+    const events = await this.eventsService.getUserEvents(user);
+    return await Promise.all(
+      events.map(async (event) => {
+        const travels = await this.travelStorageService.getTravelsOfEvent(event);
+        return { event, travels };
+      }),
+    );
   }
 
-  public async getUserEvent(user: User, eventId: string): Promise<Event | null> {
-    return await this.eventsService.getUserEvent(user, eventId);
+  public async getUserEvent(user: User, eventId: string): Promise<{ event: Event; travels: Travels | null } | null> {
+    const event = await this.eventsService.getUserEvent(user, eventId);
+    const travels = await this.travelStorageService.getTravelsOfEvent(event as Event);
+    return event != null ? { event, travels } : null;
   }
 
   /**

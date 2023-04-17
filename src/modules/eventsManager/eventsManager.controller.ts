@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpException,
+  HttpStatus,
+  NotFoundException,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -9,7 +21,6 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import toDTO from 'src/utils/dtoConvertor';
 import { ObjectIdPipe } from 'src/utils/pipes';
 import { GetUser } from '../authentification/decorator';
 import { JwtGuard } from '../authentification/guard';
@@ -37,8 +48,8 @@ export class EventsManagerController {
   @UseGuards(JwtGuard)
   @Post()
   public async createEvent(@GetUser() user: User, @Body() createEventDTO: CreateEventDTO): Promise<ResponseEventDTO> {
-    const event = await this.service.createEvent(user, createEventDTO);
-    const dto = toDTO(ResponseEventDTO, event);
+    const { event, travels } = await this.service.createEvent(user, createEventDTO);
+    const dto = ResponseEventDTO.build(event, travels);
     return dto;
   }
 
@@ -54,7 +65,7 @@ export class EventsManagerController {
   @Get()
   public async getAllEvents(@GetUser() user: User): Promise<ResponseEventDTO[]> {
     const events = await this.service.getUserEvents(user);
-    return events.map((event) => toDTO(ResponseEventDTO, event));
+    return events.map(({ event, travels }) => ResponseEventDTO.build(event, travels));
   }
 
   @ApiBearerAuth()
@@ -74,13 +85,11 @@ export class EventsManagerController {
     @GetUser() user: User,
     @Param('eventId', ObjectIdPipe) eventId: string,
   ): Promise<ResponseEventDTO> {
-    const event = await this.service.getUserEvent(user, eventId);
-    console.log(event?._id);
-    if (event === null) {
+    const data = await this.service.getUserEvent(user, eventId);
+    if (data === null) {
       throw new NotFoundException();
     }
-    console.log(toDTO(ResponseEventDTO, event));
-    return toDTO(ResponseEventDTO, event);
+    return ResponseEventDTO.build(data.event, data.travels);
   }
 
   @ApiBearerAuth()
@@ -120,7 +129,11 @@ export class EventsManagerController {
     @Param('eventId', ObjectIdPipe) eventId: string,
     @Body() updateEventDTO: UpdateEventDTO,
   ): Promise<ResponseEventDTO> {
-    const event = await this.service.updateEvent(user, eventId, updateEventDTO);
-    return toDTO(ResponseEventDTO, event);
+    try {
+      const { event, travels } = await this.service.updateEvent(user, eventId, updateEventDTO);
+      return ResponseEventDTO.build(event, travels);
+    } catch (e) {
+      throw new HttpException(e, HttpStatus.NOT_FOUND);
+    }
   }
 }

@@ -64,4 +64,8 @@ export class TravelsStorageService {
     await this.handleDeleteTravels(event);
     await this.handleNewTravels(event);
   }
+
+  public async getTravelsOfEvent(event: Event): Promise<Travels | null> {
+    return await this.TravelsModel.findOne({ destinationEvent: event });
+  }
 }
