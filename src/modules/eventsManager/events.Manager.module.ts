@@ -9,6 +9,6 @@ import { EventsManagerService } from './eventsManager.service';
   imports: [UsersModule, EventsModule, TravelsStorageModule],
   providers: [EventsManagerService],
   controllers: [EventsManagerController],
-  exports: [],
+  exports: [EventsManagerService],
 })
 export class EventsManagerModule {}
