@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 import { Client, Status } from '@googlemaps/google-maps-services-js';
 import { Injectable } from '@nestjs/common';
-import { EventDocument } from 'src/modules/events/event.schema';
+import { EventDocument } from 'src/modules/events/schemas/event.schema';
 
 @Injectable()
 export class LocationValidatorService {

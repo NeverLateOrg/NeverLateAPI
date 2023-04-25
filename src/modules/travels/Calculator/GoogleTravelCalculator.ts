@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 import { Client, Status, TravelMode, UnitSystem } from '@googlemaps/google-maps-services-js';
-import { Event } from 'src/modules/events/event.schema';
+import { Event } from 'src/modules/events/schemas/event.schema';
 import { Travel } from '../Storage/storage.schema';
 import ITravelCalculator from './ITravelCalculator';
 

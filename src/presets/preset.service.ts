@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import { Connection } from 'mongoose';
 import * as path from 'path';
 import { AuthService } from 'src/modules/authentification/auth.service';
-import { EventsManagerService } from 'src/modules/eventsManager/eventsManager.service';
+import { EventsService } from 'src/modules/events/events.service';
 import { UsersService } from 'src/modules/users/users.service';
 
 @Injectable()
@@ -14,7 +14,7 @@ export class PresetService {
   constructor(
     @InjectConnection() private readonly connection: Connection,
     private readonly authService: AuthService,
-    private readonly eventManagerService: EventsManagerService,
+    private readonly eventService: EventsService,
     private readonly userService: UsersService,
   ) {}
 
@@ -66,7 +66,7 @@ export class PresetService {
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           throw new Error(`User ${event.userMail} does not exist`);
         }
-        await this.eventManagerService.createEvent(user, event);
+        await this.eventService.createEvent(user, event);
       }
     }
     this.logger.log(`Preset ${preset} applied`);

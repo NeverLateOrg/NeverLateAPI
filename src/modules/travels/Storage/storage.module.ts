@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { EventsModule } from 'src/modules/events/events.module';
 import { TravelsCalculatorModule } from '../Calculator/calculator.module';
@@ -9,7 +9,7 @@ import { TravelsStorageService } from './storage.service';
   imports: [
     MongooseModule.forFeature([{ name: Travels.name, schema: TravelsSchema }]),
     TravelsCalculatorModule,
-    EventsModule,
+    forwardRef(() => EventsModule),
   ],
   providers: [TravelsStorageService],
   controllers: [],
