@@ -1,4 +1,4 @@
-import { Event } from 'src/modules/events/event.schema';
+import { Event } from 'src/modules/events/schemas/event.schema';
 import { Travel } from '../Storage/storage.schema';
 
 export default interface ITravelCalculator {

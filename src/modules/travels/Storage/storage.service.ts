@@ -2,8 +2,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { EventsService } from 'src/modules/events/events.service';
-import { Event } from '../../events/event.schema';
+import { EventsRepository } from 'src/modules/events/events.repository';
+import { Event } from '../../events/schemas/event.schema';
 import { TravelsCalculatorService } from '../Calculator/calculator.service';
 import { Travel, Travels, TravelsDocument } from './storage.schema';
 
@@ -12,7 +12,7 @@ export class TravelsStorageService {
   constructor(
     @InjectModel(Travels.name) private readonly TravelsModel: Model<TravelsDocument>,
     private readonly travelsCalculatorService: TravelsCalculatorService,
-    private readonly eventService: EventsService,
+    private readonly eventRepository: EventsRepository,
   ) {}
 
   private async deleteTravels(event: Event): Promise<boolean> {
@@ -39,8 +39,8 @@ export class TravelsStorageService {
   }
 
   public async handleNewTravels(event: Event): Promise<void> {
-    const nextEvents = await this.eventService.findNextEvents(event);
-    const previousEvents = await this.eventService.findPreviousEvents(event);
+    const nextEvents = await this.eventRepository.findNextEvents(event);
+    const previousEvents = await this.eventRepository.findPreviousEvents(event);
 
     if (previousEvents.length > 0) {
       await this.setTravels(event, previousEvents);

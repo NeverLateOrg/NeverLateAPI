@@ -1,11 +1,11 @@
+import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { Injectable } from '@nestjs/common';
 
-import * as dotenv from 'dotenv';
 import { InjectModel } from '@nestjs/mongoose';
+import * as dotenv from 'dotenv';
 import { Model } from 'mongoose';
-import { UserDocument } from '../../users/user.schema';
+import { UserDocument } from '../../users/schemas/user.schema';
 
 dotenv.config();
 

@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as argon from 'argon2';
 import * as dotenv from 'dotenv';
 import { Model } from 'mongoose';
-import { UserDocument } from '../users/user.schema';
+import { UserDocument } from '../users/schemas/user.schema';
 import { LoginDTO } from './dtos/login.dto';
 import { RegisterDTO } from './dtos/register.dto';
 

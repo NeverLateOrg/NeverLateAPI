@@ -5,7 +5,7 @@ import { GetUser } from '../authentification/decorator/';
 import { JwtGuard } from '../authentification/guard';
 import { UpdateUserDTO } from './dtos/update-user.dto';
 import { UserDTO } from './dtos/user.dto';
-import { User } from './user.schema';
+import { User } from './schemas/user.schema';
 
 @ApiTags('User')
 @ApiBearerAuth()

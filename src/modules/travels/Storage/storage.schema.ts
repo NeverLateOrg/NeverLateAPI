@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { Event } from 'src/modules/events/event.schema';
+import { Event } from 'src/modules/events/schemas/event.schema';
 
 export type TravelsDocument = HydratedDocument<Travels>;
 

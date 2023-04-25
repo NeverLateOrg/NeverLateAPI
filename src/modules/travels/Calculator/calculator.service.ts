@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 
 import { Injectable } from '@nestjs/common';
-import { Event } from 'src/modules/events/event.schema';
+import { Event } from 'src/modules/events/schemas/event.schema';
 import { Travel } from '../Storage/storage.schema';
 import DefaultTravelCalculator from './DefaultTravelCalculator';
 import GoogleTravelCalculator from './GoogleTravelCalculator';
