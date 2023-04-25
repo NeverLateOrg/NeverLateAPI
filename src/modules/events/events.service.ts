@@ -19,6 +19,55 @@ export class EventsService {
     return await event.save();
   }
 
+  public async getPreviousEventsOfEvent(event: Event): Promise<Event[]> {
+    try {
+      const prevEvent = await this.EventModel.find({
+        user: event.user,
+        end_date: { $lt: event.start_date },
+        _id: { $ne: event._id }, // does not include the event in parameter.
+      })
+        .sort({ end_date: -1 })
+        .limit(1);
+      return await this.getSimultaneousEventsOfEvent(prevEvent[0]);
+    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      throw new Error(`Error in getPreviousEventsOfEvent: ${error}`);
+    }
+  }
+
+  public async getNextEventsOfEvent(event: Event): Promise<Event[]> {
+    try {
+      const nextEvent = await this.EventModel.find({
+        user: event.user,
+        start_date: { $gt: event.end_date },
+        _id: { $ne: event._id }, // does not include the event in parameter.
+      })
+        .sort({ start_date: 1 })
+        .limit(1);
+
+      return await this.getSimultaneousEventsOfEvent(nextEvent[0]);
+    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      throw new Error(`Error in getNextEventsOfEvent: ${error}`);
+    }
+  }
+
+  public async getSimultaneousEventsOfEvent(event: Event): Promise<Event[]> {
+    try {
+      return await this.EventModel.find({
+        user: event.user,
+        $or: [
+          { start_date: { $lt: event.end_date }, end_date: { $gt: event.start_date } },
+          { start_date: { $gte: event.start_date }, end_date: { $lte: event.end_date } },
+        ],
+      });
+    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      throw new Error(`Error in getSimultaneousEventsOfEvent: ${error}`);
+    }
+  }
+
+  // deprecated
   public async findNextEvents(event: Event): Promise<Event[]> {
     const nextEvents = await this.EventModel.find({
       start_date: { $gte: event.end_date },
@@ -30,6 +79,7 @@ export class EventsService {
     return nextEvents;
   }
 
+  // deprecated
   public async findPreviousEvents(event: Event): Promise<Event[]> {
     const previousEvents = await this.EventModel.find({
       end_date: { $lte: event.start_date },
