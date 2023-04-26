@@ -26,7 +26,7 @@ export class TravelsStorageService {
     }
     const travels: Travel[] = [];
     for (const previousEvent of previousEvents) {
-      const travel = await this.travelsCalculatorService.travelBetween('google', previousEvent, destinationEvent);
+      const travel = await this.travelsCalculatorService.travelBetween(previousEvent, destinationEvent);
       if (travel !== null) {
         travels.push(travel);
       }

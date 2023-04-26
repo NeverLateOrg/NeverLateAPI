@@ -12,6 +12,9 @@ export class Travel {
 
   @Prop({ type: Number, required: true })
   duration: number;
+
+  @Prop({ type: Date, required: true })
+  departureDate: Date;
 }
 
 const TravelSchema = SchemaFactory.createForClass(Travel);

@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import EntityRepository from 'src/database/entity.repository';
-import { LocationValidatorService } from '../travels/locationFormator/formator.service';
+import { GoogleService } from '../google/google.service';
 import { User } from '../users/schemas/user.schema';
 import { Event, EventDocument } from './schemas/event.schema';
 
@@ -10,14 +10,16 @@ import { Event, EventDocument } from './schemas/event.schema';
 export class EventsRepository extends EntityRepository<EventDocument> {
   constructor(
     @InjectModel(Event.name) private readonly EventModel: Model<EventDocument>,
-    private readonly locationValidatorService: LocationValidatorService,
+    private readonly googleService: GoogleService,
   ) {
     super(EventModel);
   }
 
-  public async createEvent(user: User, createEventData: object): Promise<Event> {
-    let event = await this.create({ ...createEventData, user: user._id });
-    event = await this.locationValidatorService.format(event);
+  public async createEvent(user: User, createEventData: any): Promise<Event> {
+    const event = await this.create({ ...createEventData, user: user._id });
+    if (event.location !== undefined) {
+      event.location = await this.googleService.formatLocation(event.location);
+    }
     return await this.save(event);
   }
 
@@ -43,13 +45,15 @@ export class EventsRepository extends EntityRepository<EventDocument> {
     return previousEvents;
   }
 
-  public async updateEvent(user: User, eventId: string, updateEventData: object): Promise<Event> {
+  public async updateEvent(user: User, eventId: string, updateEventData: any): Promise<Event> {
     const filter = { _id: eventId, user: user._id };
-    let updatedEvent = await this.findOneAndUpdate(filter, updateEventData);
+    const updatedEvent = await this.findOneAndUpdate(filter, updateEventData);
     if (updatedEvent == null) {
       throw new NotFoundException('Event not found, or not owned by the user');
     }
-    updatedEvent = await this.locationValidatorService.format(updatedEvent);
+    if (updateEventData.location !== undefined && updatedEvent.location !== undefined) {
+      updatedEvent.location = await this.googleService.formatLocation(updatedEvent.location);
+    }
     return await this.save(updatedEvent);
   }
 
