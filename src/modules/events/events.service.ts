@@ -19,6 +19,7 @@ export class EventsService {
     return await event.save();
   }
 
+  // TODO TEST
   public async getPreviousEventsOfEvent(event: Event): Promise<Event[]> {
     try {
       const prevEvent = await this.EventModel.find({
@@ -35,6 +36,7 @@ export class EventsService {
     }
   }
 
+  // TODO TEST
   public async getNextEventsOfEvent(event: Event): Promise<Event[]> {
     try {
       const nextEvent = await this.EventModel.find({
@@ -52,6 +54,7 @@ export class EventsService {
     }
   }
 
+  // TODO TEST
   public async getSimultaneousEventsOfEvent(event: Event): Promise<Event[]> {
     try {
       return await this.EventModel.find({

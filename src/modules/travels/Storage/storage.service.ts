@@ -19,6 +19,10 @@ export class TravelsStorageService {
     return (await this.TravelsModel.deleteOne({ destinationEvent: event })).deletedCount > 0;
   }
 
+  private async deleteTravelsOfEvent(event: Event): Promise<boolean> {
+    return (await this.TravelsModel.deleteMany({ destinationEvent: event })).deletedCount > 0;
+  }
+
   private async setTravels(destinationEvent: Event, previousEvents: Event[]): Promise<Travels | null> {
     await this.deleteTravels(destinationEvent);
     if (destinationEvent.location === undefined) {
@@ -39,9 +43,9 @@ export class TravelsStorageService {
   }
 
   public async handleNewTravels(event: Event): Promise<void> {
-    const nextEvents = await this.eventService.findNextEvents(event);
-    const previousEvents = await this.eventService.findPreviousEvents(event);
-
+    const nextEvents = await this.eventService.getNextEventsOfEvent(event);
+    const previousEvents = await this.eventService.getPreviousEventsOfEvent(event);
+    const simultaneousEvents = await this.eventService.getSimultaneousEventsOfEvent(event);
     if (previousEvents.length > 0) {
       await this.setTravels(event, previousEvents);
     }
@@ -50,18 +54,55 @@ export class TravelsStorageService {
       await this.setTravels(nextEvent, [event]);
       // To be upgrade if there is at least another event at the same time
     }
-    // TODO
+
+    // TODO : Test the behaviour of this function.
+    for (const simultaneousEvent of simultaneousEvents) {
+      if (simultaneousEvent.start_date < event.start_date) {
+        await this.setTravels(event, [simultaneousEvent]);
+      } else {
+        await this.setTravels(simultaneousEvent, [event]);
+      }
+    }
   }
 
   public async handleDeleteTravels(event: Event): Promise<void> {
-    await this.deleteTravels(event);
+    const prevEvents = await this.eventService.getPreviousEventsOfEvent(event);
+    const nextEvents = await this.eventService.getNextEventsOfEvent(event);
+    const simultaneousEvents = await this.eventService.getSimultaneousEventsOfEvent(event);
 
-    // TODO
+    // deleted all travels linked to one event : event.
+    await this.deleteTravelsOfEvent(event);
+
+    // recalculate travels for prev and next event.
+    for (const nextEvent of nextEvents) {
+      await this.setTravels(nextEvent, prevEvents);
+    }
+
+    // recalculate for simultaneous event.
+
+    for (const prevEvent of prevEvents) {
+      for (const simultaneousEvent of simultaneousEvents) {
+        if (prevEvent.start_date <= simultaneousEvent.start_date) {
+          await this.setTravels(simultaneousEvent, [prevEvent]);
+        } else {
+          await this.setTravels(prevEvent, [simultaneousEvent]);
+        }
+      }
+    }
+    for (const nextEvent of nextEvents) {
+      for (const simultaneousEvent of simultaneousEvents) {
+        if (simultaneousEvent.start_date <= nextEvent.start_date) {
+          await this.setTravels(nextEvent, [simultaneousEvent]);
+        } else {
+          await this.setTravels(simultaneousEvent, [nextEvent]);
+        }
+      }
+    }
   }
 
-  public async handleUpdateTravels(event: Event): Promise<void> {
+  public async handleUpdateTravels(eventBefore: Event, event: Event): Promise<void> {
     // TODO optimize
-    await this.handleDeleteTravels(event);
+    await this.handleDeleteTravels(eventBefore);
     await this.handleNewTravels(event);
   }
 
