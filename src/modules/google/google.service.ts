@@ -14,9 +14,10 @@ interface TravelData {
 
 @Injectable()
 export class GoogleService {
-  private readonly client = new Client({});
   // temp hardcoded (will be change)
   private readonly GOOGLE_API_KEY = 'AIzaSyDMC_6DlM8RicLOfCH-7Zll1aZUqC5Ir8g';
+
+  constructor(private readonly client: Client) {}
 
   public async formatLocation(location: string): Promise<string> {
     const response = await this.client.geocode({
