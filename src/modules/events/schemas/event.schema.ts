@@ -4,6 +4,12 @@ import { User } from 'src/modules/users/schemas/user.schema';
 
 export type EventDocument = Event & Document;
 
+export enum EventStatus {
+  PENDING = 'pending',
+  ACCEPTED = 'accepted',
+  DECLINED = 'declined',
+}
+
 @Schema()
 export class Event {
   constructor(data: Partial<Event>) {
@@ -26,6 +32,9 @@ export class Event {
 
   @Prop({ type: String })
   location?: string;
+
+  @Prop({ type: String, enum: Object.values(EventStatus), default: EventStatus.PENDING })
+  status: EventStatus;
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event);
