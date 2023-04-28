@@ -25,7 +25,7 @@ import { ObjectIdPipe } from 'src/utils/pipes';
 import { GetUser } from '../authentification/decorator';
 import { JwtGuard } from '../authentification/guard';
 import { User } from '../users/schemas/user.schema';
-import { CreateEventDTO, ResponseEventDTO, UpdateEventDTO } from './dtos';
+import { CreateEventDTO, ResponseEventDTO, ResponseEventNoTravelsDTO, UpdateEventDTO } from './dtos';
 import { EventsService } from './events.service';
 
 @ApiTags('Events')
@@ -136,5 +136,47 @@ export class EventsController {
     } catch (e) {
       throw new HttpException(e, HttpStatus.NOT_FOUND);
     }
+  }
+
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    description: 'The event has been accepted successfully.',
+    type: ResponseEventNoTravelsDTO,
+  })
+  @ApiNotFoundResponse({
+    description: 'Event not found. Please check the eventId parameter.',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized',
+  })
+  @UseGuards(JwtGuard)
+  @Put(':eventId/accept')
+  public async acceptEvent(
+    @GetUser() user: User,
+    @Param('eventId', ObjectIdPipe) eventId: string,
+  ): Promise<ResponseEventDTO> {
+    const event = await this.eventService.acceptEvent(user, eventId);
+    return ResponseEventNoTravelsDTO.build(event);
+  }
+
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    description: 'The event has been declined successfully.',
+    type: ResponseEventNoTravelsDTO,
+  })
+  @ApiNotFoundResponse({
+    description: 'Event not found. Please check the eventId parameter.',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized',
+  })
+  @UseGuards(JwtGuard)
+  @Put(':eventId/decline')
+  public async declineEvent(
+    @GetUser() user: User,
+    @Param('eventId', ObjectIdPipe) eventId: string,
+  ): Promise<ResponseEventDTO> {
+    const event = await this.eventService.declineEvent(user, eventId);
+    return ResponseEventNoTravelsDTO.build(event);
   }
 }

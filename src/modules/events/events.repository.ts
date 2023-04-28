@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import EntityRepository from 'src/database/entity.repository';
 import { GoogleService } from '../google/google.service';
 import { User } from '../users/schemas/user.schema';
-import { Event, EventDocument } from './schemas/event.schema';
+import { Event, EventDocument, EventStatus } from './schemas/event.schema';
 
 @Injectable()
 export class EventsRepository extends EntityRepository<EventDocument> {
@@ -15,8 +15,9 @@ export class EventsRepository extends EntityRepository<EventDocument> {
     super(EventModel);
   }
 
-  public async createEvent(user: User, createEventData: any): Promise<Event> {
-    const event = await this.create({ ...createEventData, user: user._id });
+  public async createLocalEvent(user: User, createEventData: any): Promise<Event> {
+    // by default a local event created by the user is set to accepted
+    const event = await this.create({ ...createEventData, status: EventStatus.ACCEPTED, user: user._id });
     if (event.location !== undefined) {
       event.location = await this.googleService.formatLocation(event.location);
     }
@@ -64,5 +65,15 @@ export class EventsRepository extends EntityRepository<EventDocument> {
 
   public async getUserEvent(user: User, eventId: string): Promise<EventDocument | null> {
     return await this.findOne({ user: user._id, _id: eventId });
+  }
+
+  // This function can set the status of an event to "accepted" or "rejected"
+  public async setEventStatus(user: User, eventId: string, status: EventStatus): Promise<Event> {
+    const event = await this.findOne({ user: user._id, _id: eventId });
+    if (event == null) {
+      throw new NotFoundException('Event not found, or not owned by the user');
+    }
+    event.status = status;
+    return await this.save(event);
   }
 }

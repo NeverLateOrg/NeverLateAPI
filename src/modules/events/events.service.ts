@@ -4,7 +4,7 @@ import { TravelsStorageService } from '../travels/Storage/storage.service';
 import { User } from '../users/schemas/user.schema';
 import { CreateEventDTO, UpdateEventDTO } from './dtos';
 import { EventsRepository } from './events.repository';
-import { Event } from './schemas/event.schema';
+import { Event, EventStatus } from './schemas/event.schema';
 
 @Injectable()
 export class EventsService {
@@ -17,7 +17,7 @@ export class EventsService {
     user: User,
     createEventDTO: CreateEventDTO,
   ): Promise<{ event: Event; travels: Travels | null }> {
-    const createdEvent = await this.eventRepository.createEvent(user, createEventDTO);
+    const createdEvent = await this.eventRepository.createLocalEvent(user, createEventDTO);
     await this.travelStorageService.handleNewTravels(createdEvent);
     const travels = await this.travelStorageService.getTravelsOfEvent(createdEvent);
     return { event: createdEvent, travels };
@@ -61,5 +61,15 @@ export class EventsService {
     await event.delete();
     await this.travelStorageService.handleDeleteTravels(event);
     return true;
+  }
+
+  public async acceptEvent(user: User, eventId: string): Promise<Event> {
+    const event = await this.eventRepository.setEventStatus(user, eventId, EventStatus.ACCEPTED);
+    return event;
+  }
+
+  public async declineEvent(user: User, eventId: string): Promise<Event> {
+    const event = await this.eventRepository.setEventStatus(user, eventId, EventStatus.DECLINED);
+    return event;
   }
 }
