@@ -1,6 +1,6 @@
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
-import { LocationValidatorModule } from 'src/modules/travels/locationFormator/formator.module';
+import { GoogleModule } from 'src/modules/google/google.module';
 import { User, UserSchema } from 'src/modules/users/schemas/user.schema';
 import { userStub } from 'src/modules/users/test/stubs/user.stubs';
 import { UsersRepository } from 'src/modules/users/users.repository';
@@ -29,7 +29,7 @@ describe('EventsRepository', () => {
     userRepository = userModule.get<UsersRepository>(UsersRepository);
 
     const module: TestingModule = await Test.createTestingModule({
-      imports: [LocationValidatorModule],
+      imports: [GoogleModule],
       providers: [EventsRepository, { provide: getModelToken(Event.name), useValue: eventModel }],
     }).compile();
 

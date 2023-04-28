@@ -6,7 +6,6 @@ import { Travel } from '../Storage/storage.schema';
 
 export class TravelDTO {
   public static build(travel: Travel): TravelDTO {
-    console.log('travel: ', travel.fromEvent._id);
     return toDTO(TravelDTO, travel);
   }
 
@@ -18,4 +17,8 @@ export class TravelDTO {
   @Expose()
   @ApiProperty()
   duration: number;
+
+  @Expose()
+  @ApiProperty()
+  departureDate: Date;
 }

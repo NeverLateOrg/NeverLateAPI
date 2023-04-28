@@ -48,6 +48,7 @@ export class EventsController {
   @UseGuards(JwtGuard)
   @Post()
   public async createEvent(@GetUser() user: User, @Body() createEventDTO: CreateEventDTO): Promise<ResponseEventDTO> {
+    console.log('dto :', createEventDTO);
     const { event, travels } = await this.eventService.createEvent(user, createEventDTO);
     const dto = ResponseEventDTO.build(event, travels);
     return dto;

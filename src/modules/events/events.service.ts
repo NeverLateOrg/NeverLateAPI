@@ -8,7 +8,6 @@ import { Event } from './schemas/event.schema';
 
 @Injectable()
 export class EventsService {
-  eventsService: any;
   constructor(
     private readonly eventRepository: EventsRepository,
     private readonly travelStorageService: TravelsStorageService,
@@ -18,7 +17,7 @@ export class EventsService {
     user: User,
     createEventDTO: CreateEventDTO,
   ): Promise<{ event: Event; travels: Travels | null }> {
-    const createdEvent = await this.eventsService.createEvent(user, createEventDTO);
+    const createdEvent = await this.eventRepository.createEvent(user, createEventDTO);
     await this.travelStorageService.handleNewTravels(createdEvent);
     const travels = await this.travelStorageService.getTravelsOfEvent(createdEvent);
     return { event: createdEvent, travels };
@@ -29,14 +28,14 @@ export class EventsService {
     eventId: string,
     updateEventDTO: UpdateEventDTO,
   ): Promise<{ event: Event; travels: Travels | null }> {
-    const event = await this.eventsService.updateEvent(user, eventId, updateEventDTO);
+    const event = await this.eventRepository.updateEvent(user, eventId, updateEventDTO);
     await this.travelStorageService.handleUpdateTravels(event);
     const travels = await this.travelStorageService.getTravelsOfEvent(event);
     return { event, travels };
   }
 
   public async getUserEvents(user: User): Promise<Array<{ event: Event; travels: Travels | null }>> {
-    const events = await this.eventsService.getUserEvents(user);
+    const events = await this.eventRepository.getUserEvents(user);
     return await Promise.all(
       events.map(async (event) => {
         const travels = await this.travelStorageService.getTravelsOfEvent(event);
@@ -46,7 +45,7 @@ export class EventsService {
   }
 
   public async getUserEvent(user: User, eventId: string): Promise<{ event: Event; travels: Travels | null } | null> {
-    const event = await this.eventsService.getUserEvent(user, eventId);
+    const event = await this.eventRepository.getUserEvent(user, eventId);
     const travels = await this.travelStorageService.getTravelsOfEvent(event as Event);
     return event != null ? { event, travels } : null;
   }
@@ -55,7 +54,7 @@ export class EventsService {
    * Delete an event and update the travel associated to it if needed (if the event is the last one of the travel)
    */
   public async deleteEvent(user: User, eventId: string): Promise<boolean> {
-    const event = await this.eventsService.getUserEvent(user, eventId);
+    const event = await this.eventRepository.getUserEvent(user, eventId);
     if (event == null) {
       return false;
     }
