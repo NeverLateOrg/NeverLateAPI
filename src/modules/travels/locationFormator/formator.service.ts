@@ -11,6 +11,9 @@ export class LocationValidatorService {
   private readonly GOOGLE_API_KEY = 'AIzaSyDMC_6DlM8RicLOfCH-7Zll1aZUqC5Ir8g';
 
   public async format(event: EventDocument): Promise<EventDocument> {
+    if (event.location == null) {
+      return event;
+    }
     const response = await this.client.geocode({
       params: {
         address: event.location,
