@@ -2,8 +2,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { EventsRepository } from 'src/modules/events/events.repository';
 import { EventsService } from 'src/modules/events/events.service';
-import { Event } from '../../events/event.schema';
+import { Event } from '../../events/schemas/event.schema';
 import { TravelsCalculatorService } from '../Calculator/calculator.service';
 import { Travel, Travels, TravelsDocument } from './storage.schema';
 
@@ -12,6 +13,7 @@ export class TravelsStorageService {
   constructor(
     @InjectModel(Travels.name) private readonly TravelsModel: Model<TravelsDocument>,
     private readonly travelsCalculatorService: TravelsCalculatorService,
+    private readonly eventRepository: EventsRepository,
     private readonly eventService: EventsService,
   ) {}
 
@@ -30,7 +32,7 @@ export class TravelsStorageService {
     }
     const travels: Travel[] = [];
     for (const previousEvent of previousEvents) {
-      const travel = await this.travelsCalculatorService.travelBetween('google', previousEvent, destinationEvent);
+      const travel = await this.travelsCalculatorService.travelBetween(previousEvent, destinationEvent);
       if (travel !== null) {
         travels.push(travel);
       }

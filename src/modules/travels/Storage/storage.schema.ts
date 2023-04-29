@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { Event } from 'src/modules/events/event.schema';
+import { Event } from 'src/modules/events/schemas/event.schema';
 
 export type TravelsDocument = HydratedDocument<Travels>;
 
@@ -12,6 +12,9 @@ export class Travel {
 
   @Prop({ type: Number, required: true })
   duration: number;
+
+  @Prop({ type: Date, required: true })
+  departureDate: Date;
 }
 
 const TravelSchema = SchemaFactory.createForClass(Travel);

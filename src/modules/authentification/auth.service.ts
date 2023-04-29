@@ -1,10 +1,8 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { InjectModel } from '@nestjs/mongoose';
 import * as argon from 'argon2';
 import * as dotenv from 'dotenv';
-import { Model } from 'mongoose';
-import { UserDocument } from '../users/user.schema';
+import { UsersRepository } from '../users/users.repository';
 import { LoginDTO } from './dtos/login.dto';
 import { RegisterDTO } from './dtos/register.dto';
 
@@ -12,11 +10,11 @@ dotenv.config();
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectModel('User') private readonly userModel: Model<UserDocument>, private readonly jwt: JwtService) {}
+  constructor(private readonly userRepository: UsersRepository, private readonly jwt: JwtService) {}
 
   async register(registerDTO: RegisterDTO): Promise<string> {
     const email = registerDTO.email;
-    const toto = await this.userModel.findOne({ email }).exec();
+    const toto = await this.userRepository.findOne({ email });
 
     if (toto != null) throw new ForbiddenException('Email already used.');
 
@@ -24,13 +22,13 @@ export class AuthService {
     // eslint-disable-next-line no-useless-catch
     try {
       // eslint-disable-next-line new-cap
-      const newUser = new this.userModel({
+      const newUser = await this.userRepository.create({
         email: registerDTO.email.toLowerCase(),
         firstName: registerDTO.firstName,
         lastName: registerDTO.lastName,
         passwordHash: hashedPassword,
       });
-      await newUser.save();
+      await this.userRepository.save(newUser);
 
       return await this.signToken(newUser.id, newUser.email);
     } catch (error) {
@@ -39,7 +37,7 @@ export class AuthService {
   }
 
   async login(loginDTO: LoginDTO): Promise<string> {
-    const user = await this.userModel.findOne({ email: loginDTO.email }).exec();
+    const user = await this.userRepository.findOne({ email: loginDTO.email });
     if (user == null) throw new ForbiddenException('Credentials incorrect');
 
     const pwMatches = await argon.verify(user.passwordHash, loginDTO.password);

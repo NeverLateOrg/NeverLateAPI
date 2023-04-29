@@ -1,22 +1,41 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { Travels } from '../travels/Storage/storage.schema';
+import { TravelsStorageService } from '../travels/Storage/storage.service';
+import { User } from '../users/schemas/user.schema';
+import { CreateEventDTO, UpdateEventDTO } from './dtos';
+import { EventsRepository } from './events.repository';
+import { Event, EventStatus, EventDocument } from './schemas/event.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateEventDTO, UpdateEventDTO } from '../eventsManager/dtos';
-import { LocationValidatorService } from '../travels/locationFormator/formator.service';
-import { User } from '../users/user.schema';
-import { Event, EventDocument } from './event.schema';
 
 @Injectable()
 export class EventsService {
   constructor(
     @InjectModel(Event.name) private readonly EventModel: Model<EventDocument>,
-    private readonly locationValidatorService: LocationValidatorService,
+    private readonly eventRepository: EventsRepository,
+    private readonly travelStorageService: TravelsStorageService,
   ) {}
 
-  public async createEvent(user: User, createEventDTO: CreateEventDTO): Promise<Event> {
-    let event = new this.EventModel({ ...createEventDTO, user: user._id });
-    event = await this.locationValidatorService.format(event);
-    return await event.save();
+  public async createEvent(
+    user: User,
+    createEventDTO: CreateEventDTO,
+  ): Promise<{ event: Event; travels: Travels | null }> {
+    const createdEvent = await this.eventRepository.createLocalEvent(user, createEventDTO);
+    await this.travelStorageService.handleNewTravels(createdEvent);
+    const travels = await this.travelStorageService.getTravelsOfEvent(createdEvent);
+    return { event: createdEvent, travels };
+  }
+
+  public async updateEvent(
+    user: User,
+    eventId: string,
+    updateEventDTO: UpdateEventDTO,
+  ): Promise<{ event: Event; travels: Travels | null }> {
+    const event = await this.eventRepository.getEventById(user, eventId);
+    const updateEvent = await this.eventRepository.updateEvent(user, eventId, updateEventDTO);
+    await this.travelStorageService.handleUpdateTravels(event, updateEvent);
+    const travels = await this.travelStorageService.getTravelsOfEvent(updateEvent);
+    return { event: updateEvent, travels };
   }
 
   // TODO TEST
@@ -70,48 +89,36 @@ export class EventsService {
     }
   }
 
-  // deprecated
-  public async findNextEvents(event: Event): Promise<Event[]> {
-    const nextEvents = await this.EventModel.find({
-      start_date: { $gte: event.end_date },
-      _id: { $ne: event._id }, // exclude the given event from the results
-    })
-      .sort({ start_date: 1 }) // sort by start date in ascending order
-      .limit(1) // limit to the first result
-      .exec();
-    return nextEvents;
+  public async getUserEvents(user: User): Promise<Array<{ event: Event; travels: Travels | null }>> {
+    const events = await this.eventRepository.getUserEvents(user);
+    return await Promise.all(
+      events.map(async (event) => {
+        const travels = await this.travelStorageService.getTravelsOfEvent(event);
+        return { event, travels };
+      }),
+    );
   }
 
-  // deprecated
-  public async findPreviousEvents(event: Event): Promise<Event[]> {
-    const previousEvents = await this.EventModel.find({
-      end_date: { $lte: event.start_date },
-      _id: { $ne: event._id }, // exclude the given event from the results
-    })
-      .sort({ end_date: -1 }) // sort by start date in ascending order
-      .limit(1) // limit to the first result
-      .exec();
-    return previousEvents;
-  }
-
-  public async updateEvent(user: User, eventId: string, updateEventDTO: UpdateEventDTO): Promise<Event> {
-    const filter = { _id: eventId, user: user._id };
-    const returnUpdated = { new: true };
-    let updatedEvent = await this.EventModel.findOneAndUpdate(filter, updateEventDTO, returnUpdated);
-    if (updatedEvent == null) {
-      throw new NotFoundException('Event not found, or not owned by the user');
+  /**
+   * Delete an event and update the travel associated to it if needed (if the event is the last one of the travel)
+   */
+  public async deleteEvent(user: User, eventId: string): Promise<boolean> {
+    const event = await this.eventRepository.getUserEvent(user, eventId);
+    if (event == null) {
+      return false;
     }
-    updatedEvent = await this.locationValidatorService.format(updatedEvent);
-    return await updatedEvent.save();
+    await event.delete();
+    await this.travelStorageService.handleDeleteTravels(event);
+    return true;
   }
 
-  public async getUserEvents(user: User): Promise<Event[]> {
-    const events = await this.EventModel.find({ user: user._id });
-    return events;
+  public async acceptEvent(user: User, eventId: string): Promise<Event> {
+    const event = await this.eventRepository.setEventStatus(user, eventId, EventStatus.ACCEPTED);
+    return event;
   }
 
-  public async getUserEvent(user: User, eventId: string): Promise<EventDocument | null> {
-    console.log('user', user._id, 'event', eventId);
-    return await this.EventModel.findOne({ user: user._id, _id: eventId });
+  public async declineEvent(user: User, eventId: string): Promise<Event> {
+    const event = await this.eventRepository.setEventStatus(user, eventId, EventStatus.DECLINED);
+    return event;
   }
 }

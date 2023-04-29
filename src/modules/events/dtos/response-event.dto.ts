@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
-import { Event } from 'src/modules/events/event.schema';
-import { Travels } from 'src/modules/travels/Storage/storage.schema';
+import { Event, EventStatus } from 'src/modules/events/schemas/event.schema';
 import { TravelDTO } from 'src/modules/travels/dtos/travels.dto';
+import { Travels } from 'src/modules/travels/Storage/storage.schema';
 import toDTO from 'src/utils/dtoConvertor';
 import { TransformObjectId } from 'src/utils/transformers';
 
@@ -33,6 +33,10 @@ export class ResponseEventDTO {
   @Expose()
   @ApiProperty({ required: false })
   public location?: string;
+
+  @Expose()
+  @ApiProperty({ enum: Object.values(EventStatus) })
+  public status: string;
 
   @Expose()
   @ApiProperty({ required: false, type: [TravelDTO] })
