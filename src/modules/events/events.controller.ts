@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   HttpException,
   HttpStatus,
   NotFoundException,
@@ -105,6 +106,7 @@ export class EventsController {
   })
   @UseGuards(JwtGuard)
   @Delete(':eventId')
+  @HttpCode(204)
   public async deleteEvent(@GetUser() user: User, @Param('eventId', ObjectIdPipe) eventId: string): Promise<void> {
     const success = await this.eventService.deleteEvent(user, eventId);
     if (!success) {
