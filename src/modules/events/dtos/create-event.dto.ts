@@ -6,7 +6,7 @@ export class CreateEventDTO {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  public name: string;
+  public title: string;
 
   @ApiProperty()
   @IsDate()
