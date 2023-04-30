@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AppController } from './app.controller';
 import { CommandsModule } from './commands/commands.module';
 import { AuthModule } from './modules/authentification/auth.module';
 import { EventsModule } from './modules/events/events.module';
@@ -17,5 +18,6 @@ import { PresetModule } from './presets/preset.module';
     PresetModule,
     CommandsModule,
   ],
+  controllers: [AppController],
 })
 export class AppModule {}
