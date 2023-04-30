@@ -20,8 +20,8 @@ export class UpdateEventDTO {
   @Type(() => Date)
   public end_date: Date;
 
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
-  @ApiProperty({ required: false })
   public location?: string;
 }

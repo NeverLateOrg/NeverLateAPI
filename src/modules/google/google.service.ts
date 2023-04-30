@@ -20,18 +20,22 @@ export class GoogleService {
   constructor(private readonly client: Client) {}
 
   public async formatLocation(location: string): Promise<string> {
-    const response = await this.client.geocode({
-      params: {
-        address: location,
-        key: this.GOOGLE_API_KEY,
-      },
-    });
-    if (response.data.status === Status.OK) {
-      // The query string was a valid address
-      if (response.data.results.length > 0) {
-        // we take the first result
-        location = response.data.results[0].formatted_address;
+    try {
+      const response = await this.client.geocode({
+        params: {
+          address: location,
+          key: this.GOOGLE_API_KEY,
+        },
+      });
+      if (response.data.status === Status.OK) {
+        // The query string was a valid address
+        if (response.data.results.length > 0) {
+          // we take the first result
+          location = response.data.results[0].formatted_address;
+        }
       }
+    } catch (error) {
+      return location;
     }
     return location;
   }
@@ -67,7 +71,6 @@ export class GoogleService {
     const adjustedArrivalTime = new Date(
       option.arrivalTime.getTime() - (option.arrivalOffsetInMinutes ?? 0) * 60 * 1000,
     );
-    console.log('here');
     const estimatedDuration = await this.calculateDuration(from, to, adjustedArrivalTime, option.mode);
     if (estimatedDuration === null) {
       return null;
