@@ -19,7 +19,7 @@ export class Event {
   _id: string;
 
   @Prop({ type: String, required: true })
-  name: string;
+  title: string;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
   user: User;

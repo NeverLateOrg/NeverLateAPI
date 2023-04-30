@@ -48,13 +48,13 @@ describe('EventsRepository', () => {
   });
 
   it('should create an event', async () => {
-    const event = await eventsRepository.createEvent(createdUser, {
-      name: 'test',
+    const event = await eventsRepository.createLocalEvent(createdUser, {
+      title: 'test',
       start_date: new Date(),
       end_date: new Date(),
     });
     expect(event).toBeDefined();
-    expect(event.name).toBe('test');
+    expect(event.title).toBe('test');
     expect(event._id).toBeDefined();
   });
 });

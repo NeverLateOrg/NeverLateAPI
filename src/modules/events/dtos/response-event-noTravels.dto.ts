@@ -16,7 +16,7 @@ export class ResponseEventNoTravelsDTO {
 
   @Expose()
   @ApiProperty()
-  public name: string;
+  public title: string;
 
   @Expose()
   @ApiProperty()

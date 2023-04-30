@@ -6,7 +6,7 @@ export class UpdateEventDTO {
   @IsOptional()
   @IsString()
   @ApiProperty({ required: false })
-  public name: string;
+  public title: string;
 
   @IsOptional()
   @ApiProperty({ required: false })
