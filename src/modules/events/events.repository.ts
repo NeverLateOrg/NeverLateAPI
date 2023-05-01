@@ -24,26 +24,37 @@ export class EventsRepository extends EntityRepository<EventDocument> {
     return await this.save(event);
   }
 
-  public async findNextEvents(event: Event): Promise<Event[]> {
-    const nextEvents = await this.EventModel.find({
-      start_date: { $gte: event.end_date },
-      _id: { $ne: event._id }, // exclude the given event from the results
+  public async getNextEventsOfEvent(event: Event): Promise<Event[]> {
+    const nextEvent = await this.EventModel.find({
+      user: event.user,
+      start_date: { $gt: event.end_date },
+      _id: { $ne: event._id }, // does not include the event in parameter.
     })
-      .sort({ start_date: 1 }) // sort by start date in ascending order
-      .limit(1) // limit to the first result
-      .exec();
-    return nextEvents;
+      .sort({ start_date: 1 })
+      .limit(1);
+
+    return await this.getSimultaneousEventsOfEvent(nextEvent[0]);
   }
 
-  public async findPreviousEvents(event: Event): Promise<Event[]> {
-    const previousEvents = await this.EventModel.find({
-      end_date: { $lte: event.start_date },
-      _id: { $ne: event._id }, // exclude the given event from the results
+  public async getPreviousEventsOfEvent(event: Event): Promise<Event[]> {
+    const prevEvent = await this.EventModel.find({
+      user: event.user,
+      end_date: { $lt: event.start_date },
+      _id: { $ne: event._id }, // does not include the event in parameter.
     })
-      .sort({ end_date: -1 }) // sort by start date in ascending order
-      .limit(1) // limit to the first result
-      .exec();
-    return previousEvents;
+      .sort({ end_date: -1 })
+      .limit(1);
+    return await this.getSimultaneousEventsOfEvent(prevEvent[0]);
+  }
+
+  public async getSimultaneousEventsOfEvent(event: Event): Promise<Event[]> {
+    return await this.EventModel.find({
+      user: event.user,
+      $or: [
+        { start_date: { $lt: event.end_date }, end_date: { $gt: event.start_date } },
+        { start_date: { $gte: event.start_date }, end_date: { $lte: event.end_date } },
+      ],
+    });
   }
 
   public async updateEvent(user: User, eventId: string, updateEventData: any): Promise<Event> {

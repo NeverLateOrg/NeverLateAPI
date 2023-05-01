@@ -4,14 +4,10 @@ import { TravelsStorageService } from '../travels/Storage/storage.service';
 import { User } from '../users/schemas/user.schema';
 import { CreateEventDTO, UpdateEventDTO } from './dtos';
 import { EventsRepository } from './events.repository';
-import { Event, EventStatus, EventDocument } from './schemas/event.schema';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-
+import { Event, EventStatus } from './schemas/event.schema';
 @Injectable()
 export class EventsService {
   constructor(
-    @InjectModel(Event.name) private readonly EventModel: Model<EventDocument>,
     private readonly eventRepository: EventsRepository,
     private readonly travelStorageService: TravelsStorageService,
   ) {}
@@ -41,14 +37,7 @@ export class EventsService {
   // TODO TEST
   public async getPreviousEventsOfEvent(event: Event): Promise<Event[]> {
     try {
-      const prevEvent = await this.EventModel.find({
-        user: event.user,
-        end_date: { $lt: event.start_date },
-        _id: { $ne: event._id }, // does not include the event in parameter.
-      })
-        .sort({ end_date: -1 })
-        .limit(1);
-      return await this.getSimultaneousEventsOfEvent(prevEvent[0]);
+      return await this.eventRepository.getPreviousEventsOfEvent(event);
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       throw new Error(`Error in getPreviousEventsOfEvent: ${error}`);
@@ -58,15 +47,7 @@ export class EventsService {
   // TODO TEST
   public async getNextEventsOfEvent(event: Event): Promise<Event[]> {
     try {
-      const nextEvent = await this.EventModel.find({
-        user: event.user,
-        start_date: { $gt: event.end_date },
-        _id: { $ne: event._id }, // does not include the event in parameter.
-      })
-        .sort({ start_date: 1 })
-        .limit(1);
-
-      return await this.getSimultaneousEventsOfEvent(nextEvent[0]);
+      return await this.eventRepository.getNextEventsOfEvent(event);
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       throw new Error(`Error in getNextEventsOfEvent: ${error}`);
@@ -76,13 +57,7 @@ export class EventsService {
   // TODO TEST
   public async getSimultaneousEventsOfEvent(event: Event): Promise<Event[]> {
     try {
-      return await this.EventModel.find({
-        user: event.user,
-        $or: [
-          { start_date: { $lt: event.end_date }, end_date: { $gt: event.start_date } },
-          { start_date: { $gte: event.start_date }, end_date: { $lte: event.end_date } },
-        ],
-      });
+      return await this.eventRepository.getSimultaneousEventsOfEvent(event);
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       throw new Error(`Error in getSimultaneousEventsOfEvent: ${error}`);
