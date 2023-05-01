@@ -34,36 +34,6 @@ export class EventsService {
     return { event: updateEvent, travels };
   }
 
-  // TODO TEST
-  public async getPreviousEventsOfEvent(event: Event): Promise<Event[]> {
-    try {
-      return await this.eventRepository.getPreviousEventsOfEvent(event);
-    } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      throw new Error(`Error in getPreviousEventsOfEvent: ${error}`);
-    }
-  }
-
-  // TODO TEST
-  public async getNextEventsOfEvent(event: Event): Promise<Event[]> {
-    try {
-      return await this.eventRepository.getNextEventsOfEvent(event);
-    } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      throw new Error(`Error in getNextEventsOfEvent: ${error}`);
-    }
-  }
-
-  // TODO TEST
-  public async getSimultaneousEventsOfEvent(event: Event): Promise<Event[]> {
-    try {
-      return await this.eventRepository.getSimultaneousEventsOfEvent(event);
-    } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      throw new Error(`Error in getSimultaneousEventsOfEvent: ${error}`);
-    }
-  }
-
   public async getUserEvents(user: User): Promise<Array<{ event: Event; travels: Travels | null }>> {
     const events = await this.eventRepository.getUserEvents(user);
     return await Promise.all(
