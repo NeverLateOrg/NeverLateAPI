@@ -2,7 +2,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { EventsRepository } from 'src/modules/events/events.repository';
 import { EventsService } from 'src/modules/events/events.service';
 import { Event } from '../../events/schemas/event.schema';
 import { TravelsCalculatorService } from '../Calculator/calculator.service';
@@ -12,11 +11,10 @@ import { Travel, Travels, TravelsDocument } from './storage.schema';
 export class TravelsStorageService {
   constructor(
     @InjectModel(Travels.name) private readonly TravelsModel: Model<TravelsDocument>,
-    private readonly travelsCalculatorService: TravelsCalculatorService,
-    private readonly eventRepository: EventsRepository,
-    private readonly eventService: EventsService,
+    private readonly travelsCalculatorService: TravelsCalculatorService, // private readonly eventService: EventsService,
   ) {}
 
+  private readonly eventService: EventsService;
   private async deleteTravels(event: Event): Promise<boolean> {
     return (await this.TravelsModel.deleteOne({ destinationEvent: event })).deletedCount > 0;
   }
