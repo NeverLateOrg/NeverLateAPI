@@ -94,4 +94,36 @@ export class GoogleService {
 
     return { duration, departureTime: estimatedDepartureTime };
   }
+
+  public async getPlaces(location: string, radius: number): Promise<string[]> {
+    const response = await this.client.placesNearby({
+      params: {
+        location,
+        radius,
+        type: 'pharmacy',
+        key: this.GOOGLE_API_KEY,
+      },
+    });
+    if (response.data.status === Status.OK) {
+      console.log(response.data.results);
+      return response.data.results.map((result) => result.place_id ?? 'none');
+    }
+    return [];
+  }
+
+  public async getPlaceDetails(placeId: string): Promise<string> {
+    const response = await this.client.placeDetails({
+      params: {
+        place_id: placeId,
+        key: this.GOOGLE_API_KEY,
+      },
+    });
+    if (response.data.status === Status.OK) {
+      console.log(response.data.result);
+      console.log(response.data.result.opening_hours?.periods);
+      // @ts-ignore
+      console.log(response.data.result.current_opening_hours.periods);
+    }
+    return '';
+  }
 }
