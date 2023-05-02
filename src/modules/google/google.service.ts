@@ -121,8 +121,7 @@ export class GoogleService {
     if (response.data.status === Status.OK) {
       console.log(response.data.result);
       console.log(response.data.result.opening_hours?.periods);
-      // @ts-ignore
-      console.log(response.data.result.current_opening_hours.periods);
+      // console.log(response.data.result.current_opening_hours.periods);
     }
     return '';
   }
