@@ -45,7 +45,7 @@ export class OpeningPeriod {
     return false;
   }
 
-  public isInside(date: Date): boolean {
+  public containsInside(date: Date): boolean {
     if (this.close === undefined) return true;
     let day = date.getDay();
     const time = String(date.getHours()).padStart(2, '0') + String(date.getMinutes()).padStart(2, '0');
@@ -56,16 +56,10 @@ export class OpeningPeriod {
     const newPeriod = this.getNormalize();
     if (newPeriod.close === undefined) return true;
 
-    if (
-      newPeriod.open.day <= day &&
-      newPeriod.close.day >= day &&
-      newPeriod.open.time <= time &&
-      newPeriod.close.time >= time
-    ) {
-      return true;
-    }
-
-    return false;
+    const open = `${newPeriod.open.day.toString().padStart(2, '0')}${newPeriod.open.time}`;
+    const close = `${newPeriod.close.day.toString().padStart(2, '0')}${newPeriod.close.time}`;
+    const target = `${day.toString().padStart(2, '0')}${time}`;
+    return target >= open && target <= close;
   }
 }
 

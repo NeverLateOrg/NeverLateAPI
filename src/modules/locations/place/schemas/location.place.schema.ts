@@ -2,13 +2,13 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { WeekOpeningPeriod, WeekOpeningPeriodSchema } from '../../schemas/weekOpeningPeriod.schema';
 
-export type LocationDocument = Location & mongoose.Document;
+export type PlaceLocationDocument = PlaceLocation & mongoose.Document;
 
 @Schema()
-export class Location {
+export class PlaceLocation {
   _id: string;
 
-  constructor(data: Partial<Location>) {
+  constructor(data: Partial<PlaceLocation>) {
     Object.assign(this, data);
   }
 
@@ -25,4 +25,4 @@ export class Location {
   opening_hours?: WeekOpeningPeriod;
 }
 
-export const LocationSchema = SchemaFactory.createForClass(Location);
+export const PlaceLocationSchema = SchemaFactory.createForClass(PlaceLocation);
