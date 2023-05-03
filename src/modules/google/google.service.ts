@@ -19,7 +19,8 @@ export class GoogleService {
 
   constructor(private readonly client: Client) {}
 
-  public async formatLocation(location: string): Promise<string> {
+  public async formatLocation(location: string): Promise<{ formattedAddress: string; wasGood: boolean }> {
+    let isGood = false;
     try {
       const response = await this.client.geocode({
         params: {
@@ -32,12 +33,13 @@ export class GoogleService {
         if (response.data.results.length > 0) {
           // we take the first result
           location = response.data.results[0].formatted_address;
+          isGood = true;
         }
       }
     } catch (error) {
-      return location;
+      return { formattedAddress: location, wasGood: isGood };
     }
-    return location;
+    return { formattedAddress: location, wasGood: isGood };
   }
 
   private async calculateDuration(

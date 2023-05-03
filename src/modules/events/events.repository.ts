@@ -19,7 +19,7 @@ export class EventsRepository extends EntityRepository<EventDocument> {
     // by default a local event created by the user is set to accepted
     const event = await this.create({ ...createEventData, status: EventStatus.ACCEPTED, user: user._id });
     if (event.location !== undefined) {
-      event.location = await this.googleService.formatLocation(event.location);
+      event.location = (await this.googleService.formatLocation(event.location)).formattedAddress;
     }
     return await this.save(event);
   }
@@ -53,7 +53,7 @@ export class EventsRepository extends EntityRepository<EventDocument> {
       throw new NotFoundException('Event not found, or not owned by the user');
     }
     if (updateEventData.location !== undefined && updatedEvent.location !== undefined) {
-      updatedEvent.location = await this.googleService.formatLocation(updatedEvent.location);
+      updatedEvent.location = (await this.googleService.formatLocation(updatedEvent.location)).formattedAddress;
     }
     return await this.save(updatedEvent);
   }
