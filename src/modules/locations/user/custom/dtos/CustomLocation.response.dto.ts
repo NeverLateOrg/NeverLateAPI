@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
+import { WeekOpeningPeriodResponseDTO } from 'src/modules/locations/dtos/weekOpeningPeriod.response.dto';
 import toDTO from 'src/utils/dtoConvertor';
 import { TransformObjectId } from 'src/utils/transformers';
 import { UserCustomLocation } from '../schemas/user.location.custom.schema';
@@ -21,4 +22,8 @@ export class CustomLocationResponseDTO {
   @Expose()
   @ApiProperty()
   public location: string;
+
+  @Expose()
+  @ApiProperty({ required: false })
+  public openingHours?: WeekOpeningPeriodResponseDTO;
 }

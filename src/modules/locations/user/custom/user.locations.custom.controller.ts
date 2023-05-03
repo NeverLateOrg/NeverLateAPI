@@ -29,7 +29,7 @@ import { CustomLocationResponseDTO } from './dtos/CustomLocation.response.dto';
 import { UpdateCustomLocationRequestDTO } from './dtos/UpdateCustomLocations.request.dto';
 import { UserCustomLocationsService } from './user.locations.custom.service';
 
-@ApiTags('CustomLocations')
+@ApiTags('Custom Locations')
 @ApiBearerAuth()
 @Controller('locations/custom')
 export class UserCustomLocationsController {

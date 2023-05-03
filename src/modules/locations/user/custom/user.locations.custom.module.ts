@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GoogleModule } from 'src/modules/google/google.module';
 import { UserCustomLocation, UserCustomLocationSchema } from './schemas/user.location.custom.schema';
+import { UserCustomLocationsController } from './user.locations.custom.controller';
 import { UserCustomLocationsRepository } from './user.locations.custom.repository';
 import { UserCustomLocationsService } from './user.locations.custom.service';
 
@@ -11,6 +12,6 @@ import { UserCustomLocationsService } from './user.locations.custom.service';
     GoogleModule,
   ],
   providers: [UserCustomLocationsRepository, UserCustomLocationsService],
-  controllers: [],
+  controllers: [UserCustomLocationsController],
 })
-export class LocationsCustomModule {}
+export class UserCustomLocationsModule {}

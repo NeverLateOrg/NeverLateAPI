@@ -23,7 +23,7 @@ export class UserCustomLocation {
   user: User;
 
   @Prop({ type: WeekOpeningPeriodSchema })
-  opening_hours?: WeekOpeningPeriod;
+  openingHours?: WeekOpeningPeriod;
 }
 
 export const UserCustomLocationSchema = SchemaFactory.createForClass(UserCustomLocation);

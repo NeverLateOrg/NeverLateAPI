@@ -21,7 +21,7 @@ export class UserCustomLocationsService {
     if (!wasGood) {
       throw new BadRequestException('Invalid location');
     }
-    const customLocation = { name, formattedAddress, user };
+    const customLocation = { name, location: formattedAddress, user };
     return await this.userCustomLocationsRepository.create(customLocation);
   }
 
