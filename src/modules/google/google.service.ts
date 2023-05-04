@@ -10,6 +10,7 @@ interface TravelOption {
 interface TravelData {
   duration: number;
   departureTime: Date;
+  arrivalTime?: Date;
 }
 
 @Injectable()
@@ -67,30 +68,68 @@ export class GoogleService {
     return null;
   }
 
+  private async getTransitData(from: string, to: string, arrivalTime: Date): Promise<TravelData | null> {
+    try {
+      const response = await this.client.directions({
+        params: {
+          origin: from,
+          destination: to,
+          mode: TravelMode.transit,
+          traffic_model: TrafficModel.best_guess,
+          units: UnitSystem.metric,
+          key: this.GOOGLE_API_KEY,
+          arrival_time: arrivalTime.getTime(),
+        },
+      });
+      if (response.data.status === Status.OK) {
+        const leg = response.data.routes[0].legs[0];
+        return {
+          duration: leg.duration.value,
+          arrivalTime: new Date(leg.arrival_time.value),
+          departureTime: new Date(leg.departure_time.value),
+        };
+      }
+    } catch (error) {
+      return null;
+    }
+    return null;
+  }
+
   public async calculateTravel(from: string, to: string, option: TravelOption): Promise<TravelData | null> {
     const adjustedArrivalTime = new Date(
       option.arrivalTime.getTime() - (option.arrivalOffsetInMinutes ?? 0) * 60 * 1000,
     );
-    const estimatedDuration = await this.calculateDuration(from, to, adjustedArrivalTime, option.mode);
-    if (estimatedDuration === null) {
-      return null;
-    }
-    let estimatedDepartureTime = new Date(adjustedArrivalTime.getTime() - estimatedDuration * 1000);
 
-    let duration: number | null;
-    let arrivalDate: Date;
-    do {
-      duration = await this.calculateDuration(from, to, estimatedDepartureTime, option.mode);
-      if (duration === null) {
+    let duration: number | null = null;
+    let estimatedDepartureTime: Date | null = null;
+
+    if (option.mode === 'transit') {
+      const transitData = await this.getTransitData(from, to, adjustedArrivalTime);
+      if (transitData === null) {
         return null;
       }
-      arrivalDate = new Date(estimatedDepartureTime.getTime() + duration * 1000);
-      if (arrivalDate.getTime() > adjustedArrivalTime.getTime()) {
-        estimatedDepartureTime = new Date(adjustedArrivalTime.getTime() - duration * 1000);
-      } else {
-        break;
+      duration = transitData.duration;
+      estimatedDepartureTime = transitData.departureTime;
+    } else {
+      const estimatedDuration = await this.calculateDuration(from, to, adjustedArrivalTime, option.mode);
+      if (estimatedDuration === null) {
+        return null;
       }
-    } while (true);
+      estimatedDepartureTime = new Date(adjustedArrivalTime.getTime() - estimatedDuration * 1000);
+
+      do {
+        duration = await this.calculateDuration(from, to, estimatedDepartureTime, option.mode);
+        if (duration === null) {
+          return null;
+        }
+        const arrivalDate = new Date(estimatedDepartureTime.getTime() + duration * 1000);
+        if (arrivalDate.getTime() > adjustedArrivalTime.getTime()) {
+          estimatedDepartureTime = new Date(adjustedArrivalTime.getTime() - duration * 1000);
+        } else {
+          break;
+        }
+      } while (true);
+    }
 
     return { duration, departureTime: estimatedDepartureTime };
   }
