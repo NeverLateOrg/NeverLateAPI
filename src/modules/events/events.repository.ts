@@ -1,10 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import EntityRepository from 'src/database/entity.repository';
 import { GoogleService } from '../google/google.service';
 import { User } from '../users/schemas/user.schema';
 import { Event, EventDocument, EventStatus } from './schemas/event.schema';
+
+export enum SearchContext {
+  PREVIOUS = 'previous',
+  NEXT = 'next',
+}
 
 @Injectable()
 export class EventsRepository extends EntityRepository<EventDocument> {
@@ -24,26 +29,65 @@ export class EventsRepository extends EntityRepository<EventDocument> {
     return await this.save(event);
   }
 
-  public async findNextEvents(event: Event): Promise<Event[]> {
-    const nextEvents = await this.EventModel.find({
+  public async getNextEventsOfEvent(event: Event): Promise<Event[]> {
+    const nextEvent = await this.EventModel.find({
+      user: event.user,
       start_date: { $gte: event.end_date },
-      _id: { $ne: event._id }, // exclude the given event from the results
+      _id: { $ne: event._id }, // does not include the event in parameter.
     })
-      .sort({ start_date: 1 }) // sort by start date in ascending order
-      .limit(1) // limit to the first result
-      .exec();
-    return nextEvents;
+      .sort({ start_date: 1 })
+      .limit(1);
+
+    if (nextEvent.length === 0) {
+      return [];
+    }
+    return [
+      nextEvent[0],
+      ...(await this.getSimultaneousEventsOfEvent(nextEvent[0], { event, searchContext: SearchContext.NEXT })),
+    ];
   }
 
-  public async findPreviousEvents(event: Event): Promise<Event[]> {
-    const previousEvents = await this.EventModel.find({
+  public async getPreviousEventsOfEvent(event: Event): Promise<Event[]> {
+    const prevEvent = await this.EventModel.find({
+      user: event.user,
       end_date: { $lte: event.start_date },
-      _id: { $ne: event._id }, // exclude the given event from the results
+      _id: { $ne: event._id }, // does not include the event in parameter.
     })
-      .sort({ end_date: -1 }) // sort by start date in ascending order
-      .limit(1) // limit to the first result
-      .exec();
-    return previousEvents;
+      .sort({ end_date: -1 })
+      .limit(1);
+    if (prevEvent.length === 0) {
+      return [];
+    }
+    return [
+      prevEvent[0],
+      ...(await this.getSimultaneousEventsOfEvent(prevEvent[0], { event, searchContext: SearchContext.PREVIOUS })),
+    ];
+  }
+
+  public async getSimultaneousEventsOfEvent(
+    event: Event,
+    excludeEvent?: { event: Event; searchContext: SearchContext },
+  ): Promise<Event[]> {
+    const case1: Array<FilterQuery<EventDocument>> = [
+      { start_date: { $gte: event.start_date } },
+      { start_date: { $lt: event.end_date } },
+    ];
+    const case2: Array<FilterQuery<EventDocument>> = [
+      { end_date: { $gt: event.start_date } },
+      { end_date: { $lte: event.end_date } },
+    ];
+    if (excludeEvent !== undefined) {
+      if (excludeEvent.searchContext === SearchContext.NEXT) {
+        case2.push({ start_date: { $gt: excludeEvent.event.end_date } });
+      } else {
+        case1.push({ end_date: { $lt: excludeEvent.event.start_date } });
+      }
+    }
+    return await this.EventModel.find({
+      user: event.user,
+      _id: { $ne: event._id }, // does not include the event in parameter.
+      $or: [{ $and: case1 }, { $and: case2 }],
+    });
   }
 
   public async updateEvent(user: User, eventId: string, updateEventData: any): Promise<Event> {
@@ -75,5 +119,13 @@ export class EventsRepository extends EntityRepository<EventDocument> {
     }
     event.status = status;
     return await this.save(event);
+  }
+
+  public async getEventById(user: User, eventId: string): Promise<Event> {
+    const event = await this.findOne({ user: user._id, _id: eventId });
+    if (event == null) {
+      throw new NotFoundException('Event not found, or not owned by the user');
+    }
+    return event;
   }
 }

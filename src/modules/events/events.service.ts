@@ -5,7 +5,6 @@ import { User } from '../users/schemas/user.schema';
 import { CreateEventDTO, UpdateEventDTO } from './dtos';
 import { EventsRepository } from './events.repository';
 import { Event, EventStatus } from './schemas/event.schema';
-
 @Injectable()
 export class EventsService {
   constructor(
@@ -28,10 +27,11 @@ export class EventsService {
     eventId: string,
     updateEventDTO: UpdateEventDTO,
   ): Promise<{ event: Event; travels: Travels | null }> {
-    const event = await this.eventRepository.updateEvent(user, eventId, updateEventDTO);
-    await this.travelStorageService.handleUpdateTravels(event);
-    const travels = await this.travelStorageService.getTravelsOfEvent(event);
-    return { event, travels };
+    const event = await this.eventRepository.getEventById(user, eventId);
+    const updateEvent = await this.eventRepository.updateEvent(user, eventId, updateEventDTO);
+    await this.travelStorageService.handleUpdateTravels(event, updateEvent);
+    const travels = await this.travelStorageService.getTravelsOfEvent(updateEvent);
+    return { event: updateEvent, travels };
   }
 
   public async getUserEvents(user: User): Promise<Array<{ event: Event; travels: Travels | null }>> {

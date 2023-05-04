@@ -2,7 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { EventsRepository } from 'src/modules/events/events.repository';
+import { EventsRepository, SearchContext } from 'src/modules/events/events.repository';
 import { Event } from '../../events/schemas/event.schema';
 import { TravelsCalculatorService } from '../Calculator/calculator.service';
 import { Travel, Travels, TravelsDocument } from './storage.schema';
@@ -12,7 +12,7 @@ export class TravelsStorageService {
   constructor(
     @InjectModel(Travels.name) private readonly TravelsModel: Model<TravelsDocument>,
     private readonly travelsCalculatorService: TravelsCalculatorService,
-    private readonly eventRepository: EventsRepository,
+    private readonly eventsRepository: EventsRepository,
   ) {}
 
   private async deleteTravels(event: Event): Promise<boolean> {
@@ -39,29 +39,39 @@ export class TravelsStorageService {
   }
 
   public async handleNewTravels(event: Event): Promise<void> {
-    const nextEvents = await this.eventRepository.findNextEvents(event);
-    const previousEvents = await this.eventRepository.findPreviousEvents(event);
+    const nextEvents = await this.eventsRepository.getNextEventsOfEvent(event);
+    const previousEvents = await this.eventsRepository.getPreviousEventsOfEvent(event);
 
     if (previousEvents.length > 0) {
       await this.setTravels(event, previousEvents);
     }
 
     for (const nextEvent of nextEvents) {
-      await this.setTravels(nextEvent, [event]);
-      // To be upgrade if there is at least another event at the same time
+      // Can be optimized
+      const simultaneousEvents = await this.eventsRepository.getSimultaneousEventsOfEvent(event, {
+        event: nextEvent,
+        searchContext: SearchContext.NEXT,
+      });
+      await this.setTravels(nextEvent, [event, ...simultaneousEvents]);
     }
-    // TODO
   }
 
   public async handleDeleteTravels(event: Event): Promise<void> {
+    const nextEvents = await this.eventsRepository.getNextEventsOfEvent(event);
+
+    // deleted all travels linked to one event : event.
     await this.deleteTravels(event);
 
-    // TODO
+    // recalculate travels for prev and next event.
+    for (const nextEvent of nextEvents) {
+      const nextPrevEvents = await this.eventsRepository.getPreviousEventsOfEvent(nextEvent);
+      await this.setTravels(nextEvent, nextPrevEvents);
+    }
   }
 
-  public async handleUpdateTravels(event: Event): Promise<void> {
-    // TODO optimize
-    await this.handleDeleteTravels(event);
+  public async handleUpdateTravels(eventBefore: Event, event: Event): Promise<void> {
+    // Can be optimized
+    await this.handleDeleteTravels(eventBefore);
     await this.handleNewTravels(event);
   }
 
