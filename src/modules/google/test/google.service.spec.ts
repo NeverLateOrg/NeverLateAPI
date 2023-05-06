@@ -47,7 +47,8 @@ describe('GoogleService', () => {
           key: expect.any(String),
         },
       });
-      expect(result).toEqual('Paris, France');
+      expect(result.formattedAddress).toEqual('Paris, France');
+      expect(result.wasGood).toEqual(true);
     });
     it('should do nothing location (invalid location)', async () => {
       clientMock.geocode.mockResolvedValue({
@@ -65,7 +66,8 @@ describe('GoogleService', () => {
           key: expect.any(String),
         },
       });
-      expect(result).toEqual('XXXXXXXXXX');
+      expect(result.formattedAddress).toEqual('XXXXXXXXXX');
+      expect(result.wasGood).toEqual(false);
     });
   });
 

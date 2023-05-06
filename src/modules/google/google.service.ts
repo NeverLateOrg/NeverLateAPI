@@ -1,4 +1,4 @@
-import { Client, Status, TrafficModel, TravelMode, UnitSystem } from '@googlemaps/google-maps-services-js';
+import { Client, PlaceData, Status, TrafficModel, TravelMode, UnitSystem } from '@googlemaps/google-maps-services-js';
 import { Injectable } from '@nestjs/common';
 
 interface TravelOption {
@@ -19,7 +19,8 @@ export class GoogleService {
 
   constructor(private readonly client: Client) {}
 
-  public async formatLocation(location: string): Promise<string> {
+  public async formatLocation(location: string): Promise<{ formattedAddress: string; wasGood: boolean }> {
+    let isGood = false;
     try {
       const response = await this.client.geocode({
         params: {
@@ -32,12 +33,13 @@ export class GoogleService {
         if (response.data.results.length > 0) {
           // we take the first result
           location = response.data.results[0].formatted_address;
+          isGood = true;
         }
       }
     } catch (error) {
-      return location;
+      return { formattedAddress: location, wasGood: isGood };
     }
-    return location;
+    return { formattedAddress: location, wasGood: isGood };
   }
 
   private async calculateDuration(
@@ -93,5 +95,21 @@ export class GoogleService {
     } while (true);
 
     return { duration, departureTime: estimatedDepartureTime };
+  }
+
+  public async getPlace(placeId: string): Promise<Partial<PlaceData> | null> {
+    try {
+      const response = await this.client.placeDetails({
+        params: {
+          place_id: placeId,
+          key: this.GOOGLE_API_KEY,
+        },
+      });
+      if (response.data.status === Status.OK) {
+        console.log(response.data.result);
+        return response.data.result;
+      }
+    } catch (error) {}
+    return null;
   }
 }
