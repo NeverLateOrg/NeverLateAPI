@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { PlaceLocation } from 'src/modules/locations/place/schemas/location.place.schema';
-import { WeekOpeningPeriod, WeekOpeningPeriodSchema } from 'src/modules/locations/schemas/weekOpeningPeriod.schema';
 import { User } from 'src/modules/users/schemas/user.schema';
 
 export type UserPlaceLocationDocument = UserPlaceLocation & mongoose.Document;
@@ -19,9 +18,6 @@ export class UserPlaceLocation {
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
   user: User;
-
-  @Prop({ type: WeekOpeningPeriodSchema })
-  custom_opening_hours?: WeekOpeningPeriod;
 }
 
 export const UserPlaceLocationSchema = SchemaFactory.createForClass(UserPlaceLocation);

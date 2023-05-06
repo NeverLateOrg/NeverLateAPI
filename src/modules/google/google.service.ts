@@ -1,4 +1,4 @@
-import { Client, Status, TrafficModel, TravelMode, UnitSystem } from '@googlemaps/google-maps-services-js';
+import { Client, PlaceData, Status, TrafficModel, TravelMode, UnitSystem } from '@googlemaps/google-maps-services-js';
 import { Injectable } from '@nestjs/common';
 
 interface TravelOption {
@@ -97,34 +97,19 @@ export class GoogleService {
     return { duration, departureTime: estimatedDepartureTime };
   }
 
-  public async getPlaces(location: string, radius: number): Promise<string[]> {
-    const response = await this.client.placesNearby({
-      params: {
-        location,
-        radius,
-        type: 'pharmacy',
-        key: this.GOOGLE_API_KEY,
-      },
-    });
-    if (response.data.status === Status.OK) {
-      console.log(response.data.results);
-      return response.data.results.map((result) => result.place_id ?? 'none');
-    }
-    return [];
-  }
-
-  public async getPlaceDetails(placeId: string): Promise<string> {
-    const response = await this.client.placeDetails({
-      params: {
-        place_id: placeId,
-        key: this.GOOGLE_API_KEY,
-      },
-    });
-    if (response.data.status === Status.OK) {
-      console.log(response.data.result);
-      console.log(response.data.result.opening_hours?.periods);
-      // console.log(response.data.result.current_opening_hours.periods);
-    }
-    return '';
+  public async getPlace(placeId: string): Promise<Partial<PlaceData> | null> {
+    try {
+      const response = await this.client.placeDetails({
+        params: {
+          place_id: placeId,
+          key: this.GOOGLE_API_KEY,
+        },
+      });
+      if (response.data.status === Status.OK) {
+        console.log(response.data.result);
+        return response.data.result;
+      }
+    } catch (error) {}
+    return null;
   }
 }

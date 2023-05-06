@@ -7,8 +7,5 @@ export class TestCommand extends CommandRunner {
     super();
   }
 
-  public async run(passedParams: string[]): Promise<void> {
-    const ids = await this.googleService.getPlaces('46.147281,1.513397', 300);
-    await this.googleService.getPlaceDetails(ids[0]);
-  }
+  public async run(passedParams: string[]): Promise<void> {}
 }

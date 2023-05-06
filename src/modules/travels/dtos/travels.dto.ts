@@ -11,7 +11,7 @@ export class TravelDTO {
 
   @Expose()
   @ApiProperty()
-  @TransformObjectId('fromEvent')
+  @TransformObjectId(['fromEvent'])
   fromEvent: string;
 
   @Expose()

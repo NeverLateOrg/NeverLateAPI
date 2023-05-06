@@ -21,6 +21,9 @@ export class PlaceLocation {
   @Prop({ required: true })
   address: string;
 
+  @Prop({ required: false })
+  imageUrl?: string;
+
   @Prop({ type: WeekOpeningPeriodSchema })
   opening_hours?: WeekOpeningPeriod;
 }

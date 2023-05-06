@@ -70,7 +70,7 @@ export class UserCustomLocationsController {
   }
 
   @ApiOkResponse({
-    description: 'Custom location updated',
+    description: 'Get custom location',
     type: CustomLocationResponseDTO,
   })
   @ApiNotFoundResponse({
