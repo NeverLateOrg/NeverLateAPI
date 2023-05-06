@@ -12,12 +12,12 @@ export class PlaceLocationsService {
   }
 
   public async createPlaceLocation(placeId: string, place: Partial<PlaceData>): Promise<PlaceLocation> {
-    const image = place.photos?.[0]?.photo_reference;
+    const imageRef = place.photos?.[0]?.photo_reference;
     return await this.placeLocationsRepository.create({
       placeId,
       name: place.name,
       address: place.formatted_address,
-      imageUrl: image,
+      imageRef,
     });
   }
 }

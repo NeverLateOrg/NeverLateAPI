@@ -1,6 +1,7 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { GoogleService } from 'src/modules/google/google.service';
 import { User } from 'src/modules/users/schemas/user.schema';
+import { Readable } from 'stream';
 import { PlaceLocationsService } from '../../place/locations.place.service';
 import { UserPlaceLocation } from './schemas/user.location.place.schema';
 import { UserPlaceLocationsRepository } from './user.locations.place.repository';
@@ -41,9 +42,14 @@ export class UserPlaceLocationsService {
   public async getPlaceLocation(user: User, placeLocationId: string): Promise<UserPlaceLocation> {
     const placeLocation = await this.userPlaceLocationsRepository.findOne({ user, _id: placeLocationId });
     if (placeLocation === null) {
-      throw new BadRequestException('Invalid placeLocationId');
+      throw new NotFoundException('Invalid placeLocationId');
     }
     await placeLocation.populate('placeLocation');
     return placeLocation;
+  }
+
+  public async getPlaceLocationStreamImage(user: User, placeLocationId: string): Promise<Readable | null> {
+    const placeLocation = await this.getPlaceLocation(user, placeLocationId);
+    return await this.googleService.getPlacePhoto(placeLocation.placeLocation.imageRef ?? '', 1280);
   }
 }

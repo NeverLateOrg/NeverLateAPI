@@ -22,7 +22,7 @@ export class PlaceLocation {
   address: string;
 
   @Prop({ required: false })
-  imageUrl?: string;
+  imageRef?: string;
 
   @Prop({ type: WeekOpeningPeriodSchema })
   opening_hours?: WeekOpeningPeriod;

@@ -1,5 +1,6 @@
 import { Client, PlaceData, Status, TrafficModel, TravelMode, UnitSystem } from '@googlemaps/google-maps-services-js';
 import { Injectable } from '@nestjs/common';
+import { Readable } from 'stream';
 
 interface TravelOption {
   mode: TravelMode;
@@ -148,6 +149,21 @@ export class GoogleService {
         console.log(response.data.result);
         return response.data.result;
       }
+    } catch (error) {}
+    return null;
+  }
+
+  public async getPlacePhoto(photoReference: string, maxWidth: number): Promise<Readable | null> {
+    try {
+      const response = (await this.client.placePhoto({
+        params: {
+          photoreference: photoReference,
+          maxwidth: maxWidth,
+          key: this.GOOGLE_API_KEY,
+        },
+        responseType: 'stream',
+      })) as any;
+      return response.data;
     } catch (error) {}
     return null;
   }

@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Post, StreamableFile, UseGuards } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -71,5 +72,26 @@ export class UserPlaceLocationsController {
   ): Promise<PlaceLocationResponseDTO> {
     const location = await this.userPlaceLocationsService.getPlaceLocation(user, placeLocationId);
     return PlaceLocationResponseDTO.build(location);
+  }
+
+  @ApiNotFoundResponse({
+    description: 'Place location not found or no photo found for this place',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized',
+  })
+  @ApiOperation({ summary: 'Get a photo by of the place' })
+  @ApiOkResponse({ description: 'The photo stream' })
+  @UseGuards(JwtGuard)
+  @Get(':placeLocationId/photo')
+  async getPlacePhoto(
+    @GetUser() user: User,
+    @Param('placeLocationId', ObjectIdPipe) placeLocationId: string,
+  ): Promise<StreamableFile> {
+    const stream = await this.userPlaceLocationsService.getPlaceLocationStreamImage(user, placeLocationId);
+    if (stream === null) {
+      throw new NotFoundException('No photo found for this place');
+    }
+    return new StreamableFile(stream);
   }
 }
