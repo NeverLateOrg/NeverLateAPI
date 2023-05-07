@@ -8,10 +8,21 @@ interface TravelOption {
   arrivalOffsetInMinutes?: number;
 }
 
+interface SearchOptions {
+  location?: string;
+  input: string;
+}
+
 interface TravelData {
   duration: number;
   departureTime: Date;
   arrivalTime?: Date;
+}
+
+export interface PlaceBasics {
+  placeId: string;
+  name: string;
+  address: string;
 }
 
 @Injectable()
@@ -166,5 +177,57 @@ export class GoogleService {
       return response.data;
     } catch (error) {}
     return null;
+  }
+
+  public async getMatchingPlaces(options: SearchOptions): Promise<{ nextPageToken?: string; places: PlaceBasics[] }> {
+    try {
+      const response = await this.client.textSearch({
+        params: {
+          query: options.input,
+          location: options.location ?? '',
+          key: this.GOOGLE_API_KEY,
+        },
+      });
+      if (response.data.status === Status.OK) {
+        const nextPageToken = response.data.next_page_token;
+        let places: PlaceBasics[] = response.data.results.map((result) => ({
+          placeId: result.place_id ?? '',
+          name: result.name ?? '',
+          address: result.formatted_address ?? '',
+        }));
+        places = places.filter((place) => place.placeId !== '' && place.name !== '' && place.address !== '');
+        return { nextPageToken, places };
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    return { places: [] };
+  }
+
+  public async getMatchingPlacesNextPage(
+    nextPageToken: string,
+  ): Promise<{ nextPageToken?: string; places: PlaceBasics[] }> {
+    try {
+      const response = await this.client.textSearch({
+        params: {
+          query: '',
+          pagetoken: nextPageToken,
+          key: this.GOOGLE_API_KEY,
+        },
+      });
+      if (response.data.status === Status.OK) {
+        const nextPageToken = response.data.next_page_token;
+        let places: PlaceBasics[] = response.data.results.map((result) => ({
+          placeId: result.place_id ?? '',
+          name: result.name ?? '',
+          address: result.formatted_address ?? '',
+        }));
+        places = places.filter((place) => place.placeId !== '' && place.name !== '' && place.address !== '');
+        return { nextPageToken, places };
+      }
+    } catch (error) {
+      console.log(error.data);
+    }
+    return { places: [] };
   }
 }
