@@ -32,7 +32,6 @@ export class UserPlaceLocationsController {
   @Get()
   async getPlaceLocations(@GetUser() user: User): Promise<PlaceLocationResponseDTO[]> {
     const locations = await this.userPlaceLocationsService.getPlaceLocations(user);
-    console.log(locations[0].placeLocation.name);
     return locations.map((location) => PlaceLocationResponseDTO.build(location));
   }
 

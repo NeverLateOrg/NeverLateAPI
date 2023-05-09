@@ -157,7 +157,6 @@ export class GoogleService {
         },
       });
       if (response.data.status === Status.OK) {
-        console.log(response.data.result);
         return response.data.result;
       }
     } catch (error) {}
