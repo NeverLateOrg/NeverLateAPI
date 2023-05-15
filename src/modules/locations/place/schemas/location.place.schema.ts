@@ -19,7 +19,7 @@ export class PlaceLocation {
   name: string;
 
   @Prop({ required: true })
-  address: string;
+  location: string;
 
   @Prop({ required: false })
   imageRef?: string;
