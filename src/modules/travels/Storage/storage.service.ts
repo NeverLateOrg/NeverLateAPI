@@ -50,7 +50,7 @@ export class TravelsStorageService {
       // Can be optimized
       const simultaneousEvents = await this.eventsRepository.getSimultaneousEventsOfEvent(event, {
         event: nextEvent,
-        searchContext: SearchContext.NEXT,
+        searchContext: SearchContext.PREVIOUS,
       });
       await this.setTravels(nextEvent, [event, ...simultaneousEvents]);
     }

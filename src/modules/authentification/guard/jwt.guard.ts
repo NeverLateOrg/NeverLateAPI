@@ -10,7 +10,6 @@ export class JwtGuard extends AuthGuard('jwt') {
   }
 
   handleRequest<TUser = any>(err: any, user: any, info: any, context: ExecutionContext, status?: any): TUser {
-    console.log(info);
     if (err || !user) {
       throw new ExpiredOrInvalidTokenException();
     }
