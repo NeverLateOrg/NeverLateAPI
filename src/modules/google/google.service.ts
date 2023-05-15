@@ -159,7 +159,9 @@ export class GoogleService {
       if (response.data.status === Status.OK) {
         return response.data.result;
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
     return null;
   }
 
