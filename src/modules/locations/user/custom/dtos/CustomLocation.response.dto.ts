@@ -7,7 +7,10 @@ import { UserCustomLocation } from '../schemas/user.location.custom.schema';
 
 export class CustomLocationResponseDTO {
   public static build(location: UserCustomLocation): CustomLocationResponseDTO {
-    return toDTO(CustomLocationResponseDTO, location);
+    return toDTO(CustomLocationResponseDTO, location, {
+      opening_hours:
+        location.openingHours !== undefined ? WeekOpeningPeriodResponseDTO.build(location.openingHours) : undefined,
+    });
   }
 
   @Expose()
@@ -25,5 +28,5 @@ export class CustomLocationResponseDTO {
 
   @Expose()
   @ApiProperty({ required: false })
-  public openingHours?: WeekOpeningPeriodResponseDTO;
+  public opening_hours?: WeekOpeningPeriodResponseDTO;
 }

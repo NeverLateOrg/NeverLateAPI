@@ -12,7 +12,10 @@ export class PlaceLocationResponseDTO {
       placeLocationId: location.placeLocation._id,
       name: location.placeLocation.name,
       location: location.placeLocation.location,
-      openingHours: location.placeLocation.opening_hours,
+      openingHours:
+        location.placeLocation.opening_hours !== undefined
+          ? WeekOpeningPeriodResponseDTO.build(location.placeLocation.opening_hours)
+          : undefined,
     });
   }
 

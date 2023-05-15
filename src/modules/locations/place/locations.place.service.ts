@@ -13,10 +13,12 @@ export class PlaceLocationsService {
 
   public async createPlaceLocation(placeId: string, place: Partial<PlaceData>): Promise<PlaceLocation> {
     const imageRef = place.photos?.[0]?.photo_reference;
+    console.log(place.opening_hours);
     return await this.placeLocationsRepository.create({
       placeId,
       name: place.name,
-      address: place.formatted_address,
+      location: place.formatted_address,
+      opening_hours: place.opening_hours,
       imageRef,
     });
   }
