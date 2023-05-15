@@ -11,7 +11,7 @@ export class PlaceLocationResponseDTO {
       _id: location._id,
       placeLocationId: location.placeLocation._id,
       name: location.placeLocation.name,
-      address: location.placeLocation.address,
+      location: location.placeLocation.location,
       openingHours: location.placeLocation.opening_hours,
     });
   }
@@ -32,7 +32,7 @@ export class PlaceLocationResponseDTO {
 
   @Expose()
   @ApiProperty()
-  public address: string;
+  public location: string;
 
   @Expose()
   @ApiProperty({ required: false })
