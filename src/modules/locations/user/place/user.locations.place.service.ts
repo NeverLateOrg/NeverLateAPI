@@ -50,6 +50,10 @@ export class UserPlaceLocationsService {
 
   public async getPlaceLocationStreamImage(user: User, placeLocationId: string): Promise<Readable | null> {
     const placeLocation = await this.getPlaceLocation(user, placeLocationId);
+
+    if (placeLocation.placeLocation.imageRef === null) {
+      return null;
+    }
     return await this.googleService.getPlacePhoto(placeLocation.placeLocation.imageRef ?? '', 1280);
   }
 }
