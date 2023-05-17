@@ -11,9 +11,7 @@ function getDateFromWeekDay(weekDay: number, hours: number, minutes: number): Da
 
 describe('WeekOpeningPeriodSchema', () => {
   describe('24h/24h places', () => {
-    const wop2424 = new WeekOpeningPeriod({
-      periods: [new OpeningPeriod({ open: { day: 0, time: '0000' } })],
-    });
+    const wop2424 = new WeekOpeningPeriod([new OpeningPeriod({ day: 0, time: '0000' })]);
 
     it('should be open on sunday at 00:00', () => {
       expect(wop2424.willBeOpenAt(getDateFromWeekDay(0, 0, 0))).toBe(true);
@@ -33,9 +31,7 @@ describe('WeekOpeningPeriodSchema', () => {
   });
 
   describe('0h/0h places', () => {
-    const wop = new WeekOpeningPeriod({
-      periods: [],
-    });
+    const wop = new WeekOpeningPeriod([]);
 
     it('should be close', () => {
       expect(wop.willBeOpenAt(getDateFromWeekDay(0, 12, 0))).toBe(false);
@@ -49,17 +45,15 @@ describe('WeekOpeningPeriodSchema', () => {
   });
 
   describe('places where open and close are not in the same day', () => {
-    const wop = new WeekOpeningPeriod({
-      periods: [
-        new OpeningPeriod({ close: { day: 1, time: '0100' }, open: { day: 0, time: '0730' } }),
-        new OpeningPeriod({ close: { day: 2, time: '0100' }, open: { day: 1, time: '0730' } }),
-        new OpeningPeriod({ close: { day: 3, time: '0100' }, open: { day: 2, time: '0730' } }),
-        new OpeningPeriod({ close: { day: 4, time: '0200' }, open: { day: 3, time: '0730' } }),
-        new OpeningPeriod({ close: { day: 5, time: '0200' }, open: { day: 4, time: '0730' } }),
-        new OpeningPeriod({ close: { day: 6, time: '0300' }, open: { day: 5, time: '0730' } }),
-        new OpeningPeriod({ close: { day: 0, time: '0300' }, open: { day: 6, time: '0730' } }),
-      ],
-    });
+    const wop = new WeekOpeningPeriod([
+      new OpeningPeriod({ day: 0, time: '0730' }, { day: 1, time: '0100' }),
+      new OpeningPeriod({ day: 1, time: '0730' }, { day: 2, time: '0100' }),
+      new OpeningPeriod({ day: 2, time: '0730' }, { day: 3, time: '0100' }),
+      new OpeningPeriod({ day: 3, time: '0730' }, { day: 4, time: '0200' }),
+      new OpeningPeriod({ day: 4, time: '0730' }, { day: 5, time: '0200' }),
+      new OpeningPeriod({ day: 5, time: '0730' }, { day: 6, time: '0300' }),
+      new OpeningPeriod({ day: 6, time: '0730' }, { day: 0, time: '0300' }),
+    ]);
 
     it('should be close on sunday 06:00', () => {
       expect(wop.willBeOpenAt(getDateFromWeekDay(0, 6, 0))).toBe(false);
@@ -83,21 +77,19 @@ describe('WeekOpeningPeriodSchema', () => {
   });
 
   describe('places with break during the day (and a day off, and a half day)', () => {
-    const wop = new WeekOpeningPeriod({
-      periods: [
-        new OpeningPeriod({ close: { day: 1, time: '1230' }, open: { day: 1, time: '0845' } }),
-        new OpeningPeriod({ close: { day: 1, time: '1900' }, open: { day: 1, time: '1430' } }),
-        new OpeningPeriod({ close: { day: 2, time: '1230' }, open: { day: 2, time: '0845' } }),
-        new OpeningPeriod({ close: { day: 2, time: '1900' }, open: { day: 2, time: '1430' } }),
-        new OpeningPeriod({ close: { day: 3, time: '1230' }, open: { day: 3, time: '0845' } }),
-        new OpeningPeriod({ close: { day: 3, time: '1900' }, open: { day: 3, time: '1430' } }),
-        new OpeningPeriod({ close: { day: 4, time: '1230' }, open: { day: 4, time: '0845' } }),
-        new OpeningPeriod({ close: { day: 4, time: '1900' }, open: { day: 4, time: '1430' } }),
-        new OpeningPeriod({ close: { day: 5, time: '1230' }, open: { day: 5, time: '0845' } }),
-        new OpeningPeriod({ close: { day: 5, time: '1900' }, open: { day: 5, time: '1430' } }),
-        new OpeningPeriod({ close: { day: 6, time: '1230' }, open: { day: 6, time: '0845' } }),
-      ],
-    });
+    const wop = new WeekOpeningPeriod([
+      new OpeningPeriod({ day: 1, time: '0845' }, { day: 1, time: '1230' }),
+      new OpeningPeriod({ day: 1, time: '1430' }, { day: 1, time: '1900' }),
+      new OpeningPeriod({ day: 2, time: '0845' }, { day: 2, time: '1230' }),
+      new OpeningPeriod({ day: 2, time: '1430' }, { day: 2, time: '1900' }),
+      new OpeningPeriod({ day: 3, time: '0845' }, { day: 3, time: '1230' }),
+      new OpeningPeriod({ day: 3, time: '1430' }, { day: 3, time: '1900' }),
+      new OpeningPeriod({ day: 4, time: '0845' }, { day: 4, time: '1230' }),
+      new OpeningPeriod({ day: 4, time: '1430' }, { day: 4, time: '1900' }),
+      new OpeningPeriod({ day: 5, time: '0845' }, { day: 5, time: '1230' }),
+      new OpeningPeriod({ day: 5, time: '1430' }, { day: 5, time: '1900' }),
+      new OpeningPeriod({ day: 6, time: '0845' }, { day: 6, time: '1230' }),
+    ]);
 
     it('should be open on friday 09:00', () => {
       expect(wop.willBeOpenAt(getDateFromWeekDay(5, 9, 0))).toBe(true);
@@ -131,18 +123,14 @@ describe('WeekOpeningPeriodSchema', () => {
 
   describe('complex cases', () => {
     it('case 1', () => {
-      const wop = new WeekOpeningPeriod({
-        periods: [new OpeningPeriod({ open: { day: 4, time: '1700' }, close: { day: 4, time: '1500' } })],
-      });
+      const wop = new WeekOpeningPeriod([new OpeningPeriod({ day: 4, time: '1700' }, { day: 4, time: '1500' })]);
       expect(wop.willBeOpenAt(getDateFromWeekDay(4, 18, 0))).toBe(true);
       expect(wop.willBeOpenAt(getDateFromWeekDay(4, 16, 0))).toBe(false);
       expect(wop.willBeOpenAt(getDateFromWeekDay(4, 14, 0))).toBe(true);
     });
 
     it('case 2', () => {
-      const wop = new WeekOpeningPeriod({
-        periods: [new OpeningPeriod({ open: { day: 1, time: '0800' }, close: { day: 4, time: '1900' } })],
-      });
+      const wop = new WeekOpeningPeriod([new OpeningPeriod({ day: 1, time: '0800' }, { day: 4, time: '1900' })]);
       expect(wop.willBeOpenAt(getDateFromWeekDay(3, 18, 0))).toBe(true);
       expect(wop.willBeOpenAt(getDateFromWeekDay(1, 7, 0))).toBe(false);
       expect(wop.willBeOpenAt(getDateFromWeekDay(1, 9, 0))).toBe(true);
@@ -152,9 +140,7 @@ describe('WeekOpeningPeriodSchema', () => {
     });
 
     it('case 3', () => {
-      const wop = new WeekOpeningPeriod({
-        periods: [new OpeningPeriod({ open: { day: 6, time: '0800' }, close: { day: 2, time: '1900' } })],
-      });
+      const wop = new WeekOpeningPeriod([new OpeningPeriod({ day: 6, time: '0800' }, { day: 2, time: '1900' })]);
       expect(wop.willBeOpenAt(getDateFromWeekDay(1, 18, 0))).toBe(true);
       expect(wop.willBeOpenAt(getDateFromWeekDay(6, 7, 0))).toBe(false);
       expect(wop.willBeOpenAt(getDateFromWeekDay(6, 9, 0))).toBe(true);
