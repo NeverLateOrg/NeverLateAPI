@@ -1,16 +1,16 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+/* eslint-disable @typescript-eslint/no-extraneous-class */
+import { Prop, Schema } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
+import SchemaFactoryCustom from 'src/utils/schemas/SchemaFactoryCustom';
 import { WeekOpeningPeriod, WeekOpeningPeriodSchema } from '../../schemas/weekOpeningPeriod.schema';
 
 export type PlaceLocationDocument = PlaceLocation & mongoose.Document;
 
-@Schema()
-export class PlaceLocation {
-  _id: string;
+class PlaceLocationMethods {}
 
-  constructor(data: Partial<PlaceLocation>) {
-    Object.assign(this, data);
-  }
+@Schema()
+export class PlaceLocation extends PlaceLocationMethods {
+  _id: string;
 
   @Prop({ required: true, unique: true })
   placeId: string;
@@ -28,4 +28,4 @@ export class PlaceLocation {
   opening_hours?: WeekOpeningPeriod;
 }
 
-export const PlaceLocationSchema = SchemaFactory.createForClass(PlaceLocation);
+export const PlaceLocationSchema = SchemaFactoryCustom.createForClass(PlaceLocation, PlaceLocationMethods);

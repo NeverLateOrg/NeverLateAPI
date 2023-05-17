@@ -1,16 +1,9 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema } from '@nestjs/mongoose';
+import SchemaFactoryCustom from 'src/utils/schemas/SchemaFactoryCustom';
 import { OpeningPeriod, OpeningPeriodSchema } from './openingPeriod.schema';
 
-@Schema({ _id: false })
-export class WeekOpeningPeriod {
-  constructor(data: Partial<WeekOpeningPeriod>) {
-    Object.assign(this, data);
-  }
-
-  @Prop({ type: [OpeningPeriodSchema] })
-  periods: OpeningPeriod[];
-
-  public willBeOpenAt(date: Date): boolean {
+class WeekOpeningPeriodMethods {
+  willBeOpenAt(this: WeekOpeningPeriod, date: Date): boolean {
     for (const period of this.periods) {
       if (period.containsInside(date)) return true;
     }
@@ -18,4 +11,15 @@ export class WeekOpeningPeriod {
   }
 }
 
-export const WeekOpeningPeriodSchema = SchemaFactory.createForClass(WeekOpeningPeriod);
+@Schema({ _id: false })
+export class WeekOpeningPeriod extends WeekOpeningPeriodMethods {
+  constructor(periods: OpeningPeriod[]) {
+    super();
+    this.periods = periods;
+  }
+
+  @Prop({ type: [OpeningPeriodSchema] })
+  periods: OpeningPeriod[];
+}
+
+export const WeekOpeningPeriodSchema = SchemaFactoryCustom.createForClass(WeekOpeningPeriod, WeekOpeningPeriodMethods);

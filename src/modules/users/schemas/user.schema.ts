@@ -1,15 +1,18 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
+import SchemaFactoryCustom from 'src/utils/schemas/SchemaFactoryCustom';
 
 export type UserDocument = User & mongoose.Document;
 
-@Schema()
-export class User {
-  _id: string;
-
-  constructor(data: Partial<User>) {
-    Object.assign(this, data);
+class UserMethods {
+  is(this: User, user: User): boolean {
+    return this._id === user._id;
   }
+}
+
+@Schema()
+export class User extends UserMethods {
+  _id: string;
 
   @Prop({ type: String, required: true, unique: true })
   email: string;
@@ -22,10 +25,6 @@ export class User {
 
   @Prop({ type: String, required: true })
   passwordHash: string;
-
-  is(user: User): boolean {
-    return this._id === user._id;
-  }
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
+export const UserSchema = SchemaFactoryCustom.createForClass(User, UserMethods);

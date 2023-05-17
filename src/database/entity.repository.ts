@@ -3,6 +3,10 @@ import { Document, FilterQuery, Model, UpdateQuery } from 'mongoose';
 export default abstract class EntityRepository<T extends Document> {
   constructor(private readonly EntityModel: Model<T>) {}
 
+  public get Model(): Model<T> {
+    return this.EntityModel;
+  }
+
   public async findOne(entityFilterQuery: FilterQuery<T>): Promise<T | null> {
     return await this.EntityModel.findOne(entityFilterQuery).exec();
   }

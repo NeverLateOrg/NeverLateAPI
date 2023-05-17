@@ -1,6 +1,8 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+/* eslint-disable @typescript-eslint/no-extraneous-class */
+import { Prop, Schema } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 import { User } from 'src/modules/users/schemas/user.schema';
+import SchemaFactoryCustom from 'src/utils/schemas/SchemaFactoryCustom';
 
 export type EventDocument = Event & Document;
 
@@ -10,12 +12,10 @@ export enum EventStatus {
   DECLINED = 'declined',
 }
 
-@Schema()
-export class Event {
-  constructor(data: Partial<Event>) {
-    Object.assign(this, data);
-  }
+class EventMethods {}
 
+@Schema()
+export class Event extends EventMethods {
   _id: string;
 
   @Prop({ type: String, required: true })
@@ -37,4 +37,4 @@ export class Event {
   status: EventStatus;
 }
 
-export const EventSchema = SchemaFactory.createForClass(Event);
+export const EventSchema = SchemaFactoryCustom.createForClass(Event, EventMethods);

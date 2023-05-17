@@ -1,22 +1,13 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+/* eslint-disable @typescript-eslint/no-extraneous-class */
+import { Prop, Schema } from '@nestjs/mongoose';
+import SchemaFactoryCustom from 'src/utils/schemas/SchemaFactoryCustom';
 
 export interface WeekDate {
   day: number;
   time: string;
 }
 
-@Schema({ _id: false })
-export class OpeningPeriod {
-  constructor(data: Partial<OpeningPeriod>) {
-    Object.assign(this, data);
-  }
-
-  @Prop({ required: true, type: Object })
-  open: WeekDate;
-
-  @Prop({ required: false, type: Object })
-  close?: WeekDate;
-
+class OpeningPeriodMethods {
   private static compare(d1: WeekDate, d2: WeekDate): number {
     if (d1.day < d2.day) return -1;
     if (d1.day > d2.day) return 1;
@@ -25,27 +16,24 @@ export class OpeningPeriod {
     return 0;
   }
 
-  public getNormalize(): OpeningPeriod {
-    if (this.isReverse() && this.close !== undefined) {
-      return new OpeningPeriod({
-        open: this.open,
-        close: {
-          day: this.close.day + 7,
-          time: this.close.time,
-        },
-      });
-    }
-    return new OpeningPeriod({ open: this.open, close: this.close });
-  }
-
-  public isReverse(): boolean {
+  public isReverse(this: OpeningPeriod): boolean {
     if (this.close !== undefined && OpeningPeriod.compare(this.close, this.open) < 0) {
       return true;
     }
     return false;
   }
 
-  public containsInside(date: Date): boolean {
+  public getNormalize(this: OpeningPeriod): OpeningPeriod {
+    if (this.isReverse() && this.close !== undefined) {
+      return new OpeningPeriod(this.open, {
+        day: this.close.day + 7,
+        time: this.close.time,
+      });
+    }
+    return new OpeningPeriod(this.open, this.close);
+  }
+
+  public containsInside(this: OpeningPeriod, date: Date): boolean {
     if (this.close === undefined) return true;
     let day = date.getDay();
     const time = String(date.getHours()).padStart(2, '0') + String(date.getMinutes()).padStart(2, '0');
@@ -63,4 +51,19 @@ export class OpeningPeriod {
   }
 }
 
-export const OpeningPeriodSchema = SchemaFactory.createForClass(OpeningPeriod);
+@Schema({ _id: false })
+export class OpeningPeriod extends OpeningPeriodMethods {
+  constructor(open: WeekDate, close?: WeekDate) {
+    super();
+    this.open = open;
+    this.close = close;
+  }
+
+  @Prop({ required: true, type: Object })
+  open: WeekDate;
+
+  @Prop({ required: false, type: Object })
+  close?: WeekDate;
+}
+
+export const OpeningPeriodSchema = SchemaFactoryCustom.createForClass(OpeningPeriod, OpeningPeriodMethods);

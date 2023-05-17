@@ -1,12 +1,16 @@
+/* eslint-disable @typescript-eslint/no-extraneous-class */
 /* eslint-disable @typescript-eslint/consistent-type-imports */
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Event } from 'src/modules/events/schemas/event.schema';
+import SchemaFactoryCustom from 'src/utils/schemas/SchemaFactoryCustom';
 
 export type TravelsDocument = HydratedDocument<Travels>;
 
+class TravelMethods {}
+
 @Schema()
-export class Travel {
+export class Travel extends TravelMethods {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Event.name })
   fromEvent: Event;
 
@@ -17,10 +21,12 @@ export class Travel {
   departureDate: Date;
 }
 
-const TravelSchema = SchemaFactory.createForClass(Travel);
+const TravelSchema = SchemaFactoryCustom.createForClass(Travel, TravelMethods);
+
+class TravelsMethods {}
 
 @Schema()
-export class Travels {
+export class Travels extends TravelsMethods {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Event.name, unique: true })
   destinationEvent: Event;
 
@@ -28,4 +34,4 @@ export class Travels {
   travels: Travel[];
 }
 
-export const TravelsSchema = SchemaFactory.createForClass(Travels);
+export const TravelsSchema = SchemaFactoryCustom.createForClass(Travels, TravelsMethods);
