@@ -26,7 +26,4 @@ export class UserCustomLocation extends UserCustomLocationMethods {
   openingHours?: WeekOpeningPeriod;
 }
 
-export const UserCustomLocationSchema = SchemaFactoryCustom.createForClass(
-  UserCustomLocation,
-  UserCustomLocationMethods,
-);
+export const UserCustomLocationSchema = SchemaFactoryCustom.createForClass(UserCustomLocation);

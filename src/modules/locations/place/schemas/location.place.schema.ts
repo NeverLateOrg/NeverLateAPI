@@ -24,8 +24,8 @@ export class PlaceLocation extends PlaceLocationMethods {
   @Prop({ required: false })
   imageRef?: string;
 
-  @Prop({ type: WeekOpeningPeriodSchema })
+  @Prop({ type: WeekOpeningPeriodSchema, required: false })
   opening_hours?: WeekOpeningPeriod;
 }
 
-export const PlaceLocationSchema = SchemaFactoryCustom.createForClass(PlaceLocation, PlaceLocationMethods);
+export const PlaceLocationSchema = SchemaFactoryCustom.createForClass(PlaceLocation);
