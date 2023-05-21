@@ -4,10 +4,9 @@ import { SchemaFactory } from '@nestjs/mongoose';
 import { Schema } from 'mongoose';
 
 export default class SchemaFactoryCustom {
-  static createForClass<T>(target: Type<T>): Schema<T> {
+  static createForClass<T extends TT, TT>(target: Type<T>, targetMethods: Type<TT>): Schema<T> {
     const schema = SchemaFactory.createForClass(target);
-    console.log(target.prototype);
-    for (const method of Object.getOwnPropertyNames(target.prototype)) {
+    for (const method of Object.getOwnPropertyNames(targetMethods.prototype)) {
       if (method === 'constructor') {
         continue;
       }

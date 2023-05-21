@@ -21,7 +21,7 @@ export class Travel extends TravelMethods {
   departureDate: Date;
 }
 
-const TravelSchema = SchemaFactoryCustom.createForClass(Travel);
+const TravelSchema = SchemaFactoryCustom.createForClass(Travel, TravelMethods);
 
 class TravelsMethods {}
 
@@ -34,4 +34,4 @@ export class Travels extends TravelsMethods {
   travels: Travel[];
 }
 
-export const TravelsSchema = SchemaFactoryCustom.createForClass(Travels);
+export const TravelsSchema = SchemaFactoryCustom.createForClass(Travels, TravelsMethods);

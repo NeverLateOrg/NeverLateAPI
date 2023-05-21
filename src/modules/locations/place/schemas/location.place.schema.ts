@@ -28,4 +28,4 @@ export class PlaceLocation extends PlaceLocationMethods {
   opening_hours?: WeekOpeningPeriod;
 }
 
-export const PlaceLocationSchema = SchemaFactoryCustom.createForClass(PlaceLocation);
+export const PlaceLocationSchema = SchemaFactoryCustom.createForClass(PlaceLocation, PlaceLocationMethods);
