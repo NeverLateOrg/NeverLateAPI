@@ -21,7 +21,7 @@ export class TravelsStorageService {
 
   private async setTravels(destinationEvent: Event, previousEvents: Event[]): Promise<Travels | null> {
     await this.deleteTravels(destinationEvent);
-    if (destinationEvent.location === undefined) {
+    if (!destinationEvent.hasLocation()) {
       return null;
     }
     const travels: Travel[] = [];

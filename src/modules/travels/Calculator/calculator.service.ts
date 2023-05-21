@@ -11,10 +11,12 @@ export class TravelsCalculatorService {
   constructor(private readonly googleService: GoogleService) {}
 
   public async travelBetween(from: Event, to: Event): Promise<Travel | null> {
-    if (from.location === undefined || to.location === undefined) {
+    if (!from.hasLocation() || !to.hasLocation()) {
       return null;
     }
-    const data = await this.googleService.calculateTravel(from.location, to.location, {
+    const fromLocation = from.getLocationString();
+    const toLocation = to.getLocationString();
+    const data = await this.googleService.calculateTravel(fromLocation, toLocation, {
       mode: TravelMode.driving,
       arrivalTime: to.start_date,
       arrivalOffsetInMinutes: 0,

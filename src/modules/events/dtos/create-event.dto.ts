@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsDate, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsDate, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateEventDTO {
   @ApiProperty()
@@ -22,4 +22,14 @@ export class CreateEventDTO {
   @IsString()
   @IsOptional()
   public location?: string;
+
+  @ApiProperty({ required: false, enum: ['UserCustomLocation', 'UserPlaceLocation'] })
+  @IsEnum(['UserCustomLocation', 'UserPlaceLocation'])
+  @IsOptional()
+  public savedLocationType?: 'UserCustomLocation' | 'UserPlaceLocation';
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  public savedLocation?: string;
 }
