@@ -20,4 +20,4 @@ export class UserPlaceLocation extends UserPlaceLocationMethods {
   user: User;
 }
 
-export const UserPlaceLocationSchema = SchemaFactoryCustom.createForClass(UserPlaceLocation, UserPlaceLocationMethods);
+export const UserPlaceLocationSchema = SchemaFactoryCustom.createForClass(UserPlaceLocation);

@@ -37,4 +37,4 @@ export class Event extends EventMethods {
   status: EventStatus;
 }
 
-export const EventSchema = SchemaFactoryCustom.createForClass(Event, EventMethods);
+export const EventSchema = SchemaFactoryCustom.createForClass(Event);

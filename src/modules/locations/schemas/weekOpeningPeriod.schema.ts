@@ -22,4 +22,4 @@ export class WeekOpeningPeriod extends WeekOpeningPeriodMethods {
   periods: OpeningPeriod[];
 }
 
-export const WeekOpeningPeriodSchema = SchemaFactoryCustom.createForClass(WeekOpeningPeriod, WeekOpeningPeriodMethods);
+export const WeekOpeningPeriodSchema = SchemaFactoryCustom.createForClass(WeekOpeningPeriod);

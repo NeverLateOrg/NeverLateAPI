@@ -66,4 +66,4 @@ export class OpeningPeriod extends OpeningPeriodMethods {
   close?: WeekDate;
 }
 
-export const OpeningPeriodSchema = SchemaFactoryCustom.createForClass(OpeningPeriod, OpeningPeriodMethods);
+export const OpeningPeriodSchema = SchemaFactoryCustom.createForClass(OpeningPeriod);

@@ -27,4 +27,4 @@ export class User extends UserMethods {
   passwordHash: string;
 }
 
-export const UserSchema = SchemaFactoryCustom.createForClass(User, UserMethods);
+export const UserSchema = SchemaFactoryCustom.createForClass(User);
