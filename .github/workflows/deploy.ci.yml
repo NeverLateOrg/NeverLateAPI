@@ -46,7 +46,7 @@ jobs:
       - name: Login to GHCR Docker
         run: |
           ssh -o StrictHostKeyChecking=no -i id_rsa "${MASTER_SSH_USER}@${MASTER_HOST}" "echo $GHCR_TOKEN | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin"
-       - name: Remove old image and container
+      - name: Remove old image and container
         run: |
           ssh -o StrictHostKeyChecking=no -i id_rsa "${MASTER_SSH_USER}@${MASTER_HOST}" "docker rm -f NeverLateAPI || true && docker rmi ghcr.io/neverlateorg/never-late-api:latest || true"
       - name: Download and run image
