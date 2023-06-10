@@ -51,4 +51,4 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i id_rsa "${MASTER_SSH_USER}@${MASTER_HOST}" "docker rm -f NeverLateAPI || true && docker rmi ghcr.io/neverlateorg/never-late-api:latest || true"
       - name: Download and run image
         run: |
-          ssh -o StrictHostKeyChecking=no -i id_rsa "${MASTER_SSH_USER}@${MASTER_HOST}" "docker run -d --name NeverLateAPI --env-file ${MASTER_SSH_ENV_PATH} ghcr.io/neverlateorg/never-late-api:latest"
+          ssh -o StrictHostKeyChecking=no -i id_rsa "${MASTER_SSH_USER}@${MASTER_HOST}" "docker run -d --network=neverlate-network --name NeverLateAPI --env-file ${MASTER_SSH_ENV_PATH} ghcr.io/neverlateorg/never-late-api:latest"

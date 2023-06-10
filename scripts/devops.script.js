@@ -13,17 +13,3 @@ branch('db', () => {
     });
   });
 });
-
-branch('deploy', () => {
-  branch('dev', () => {
-    leaf('rm', async () => {
-      await runner.exec('docker compose -f docker-compose.dev.yml rm -s -f -v');
-    });
-    leaf('up', async () => {
-      await runner.exec('docker compose -f docker-compose.dev.yml up -d');
-    });
-    leaf('restart', async () => {
-      await runner.runAllIgnoreFailure(['deploy:dev:rm', 'deploy:dev:up']);
-    });
-  });
-});
