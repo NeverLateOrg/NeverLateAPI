@@ -36,6 +36,7 @@ jobs:
       GHCR_TOKEN: ${{ secrets.GHCR_AT }}
       MASTER_SSH_USER: ${{ secrets.MASTER_SSH_USER }}
       MASTER_HOST: ${{ secrets.MASTER_HOST }}
+      MASTER_SSH_ENV_PATH: ${{ secrets.MASTER_SSH_ENV_PATH }}
 
     steps:
       - name: write ssh key to file
@@ -47,4 +48,4 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i id_rsa "${MASTER_SSH_USER}@${MASTER_HOST}" "echo $GHCR_TOKEN | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin"
       - name: Download and run image
         run: |
-          ssh -o StrictHostKeyChecking=no -i id_rsa "${MASTER_SSH_USER}@${MASTER_HOST}" "docker run -d --name NeverLateAPI ghcr.io/neverlateorg/never-late-api:latest"
+          ssh -o StrictHostKeyChecking=no -i id_rsa "${MASTER_SSH_USER}@${MASTER_HOST}" "docker run -d --name NeverLateAPI --env-file ${MASTER_SSH_ENV_PATH} ghcr.io/neverlateorg/never-late-api:latest"
