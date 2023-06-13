@@ -9,14 +9,14 @@
   ],
   "events": [
     {
-      "name": "Event 1",
+      "title": "Event 1",
       "start_date": "2023-04-29T18:00:00.000Z",
       "end_date": "2023-04-29T19:00:00.000Z",
       "userMail": "pierre.todo@gmail.com",
       "location": "Porte d'Italie, 75013 Paris"
     },
     {
-      "name": "Event 2",
+      "title": "Event 2",
       "start_date": "2023-04-29T20:00:00.000Z",
       "end_date": "2023-04-29T22:00:00.000Z",
       "userMail": "pierre.todo@gmail.com",

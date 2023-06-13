@@ -9,14 +9,14 @@
   ],
   "events": [
     {
-      "name": "Event 1",
+      "title": "Event 1",
       "start_date": "2018-01-01",
       "end_date": "2018-01-02",
       "userMail": "pierre.todo@gmail.com",
       "location": "Paris"
     },
     {
-      "name": "Event 2",
+      "title": "Event 2",
       "start_date": "2018-01-03",
       "end_date": "2018-01-04",
       "userMail": "pierre.todo@gmail.com",
