@@ -44,6 +44,11 @@ export class EventsService {
     );
   }
 
+  public async getUserEventsInRange(user: User, startDate: Date, endDate: Date): Promise<Event[]> {
+    const events = await this.eventRepository.getUserEventsInRange(user, startDate, endDate);
+    return events;
+  }
+
   public async getUserEvent(user: User, eventId: string): Promise<{ event: Event; travels: Travels | null } | null> {
     const event = await this.eventRepository.getUserEvent(user, eventId);
     const travels = await this.travelStorageService.getTravelsOfEvent(event as Event);
