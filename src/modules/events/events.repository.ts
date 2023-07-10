@@ -135,6 +135,12 @@ export class EventsRepository extends EntityRepository<EventDocument> {
     return events;
   }
 
+  public async getUserEventsInRange(user: User, startDate: Date, endDate: Date): Promise<Event[]> {
+    const events = await this.find({ user: user._id, start_date: { $gte: startDate }, end_date: { $lte: endDate } });
+    await this.populateAll(events);
+    return events;
+  }
+
   public async getUserEvent(user: User, eventId: string): Promise<EventDocument | null> {
     const event = await this.findOne({ user: user._id, _id: eventId });
     await this.populate(event);

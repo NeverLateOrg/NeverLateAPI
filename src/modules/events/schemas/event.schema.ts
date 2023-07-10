@@ -5,6 +5,7 @@ import { UserCustomLocation } from 'src/modules/locations/user/custom/schemas/us
 import { UserPlaceLocation } from 'src/modules/locations/user/place/schemas/user.location.place.schema';
 import { User } from 'src/modules/users/schemas/user.schema';
 import SchemaFactoryCustom from 'src/utils/schemas/SchemaFactoryCustom';
+import { CreateEventDTO } from '../dtos';
 
 export type EventDocument = Event & Document;
 
@@ -15,6 +16,10 @@ export enum EventStatus {
 }
 
 class EventMethods {
+  overlaps(this: Event, event: CreateEventDTO): boolean {
+    return this.start_date < event.end_date && event.start_date < this.end_date;
+  }
+
   hasLocation(this: Event): boolean {
     return this.location !== undefined || this.savedLocation !== undefined;
   }
