@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateEventDTO } from '../events/dtos';
 import { EventsService } from '../events/events.service';
 import { User } from '../users/schemas/user.schema';
+import { MorningAfternoonConstraint } from './Constraints/HoursConstraint';
 import { OverlapCalendarConstraint } from './Constraints/OverlapCalendarConstraint';
 import { CSP } from './CPS/Csp';
 import { FlexEventRequestDto } from './dtos/flex-event.request.dto';
@@ -41,6 +42,11 @@ export class FlexEventsService {
 
     const csp = new CSP<CreateEventDTO>();
     csp.withVariable('event', events).withConstraint(new OverlapCalendarConstraint(['event'], fixedEvents));
+    for (const constraint of dto.constraints) {
+      if (constraint.type === 'MorningAfternoonConstraint') {
+        csp.withConstraint(new MorningAfternoonConstraint('event', constraint.choice));
+      }
+    }
 
     const solution = csp.solve();
     if (solution != null) {
