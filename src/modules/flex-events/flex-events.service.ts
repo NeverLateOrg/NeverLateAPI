@@ -26,8 +26,11 @@ export class FlexEventsService {
     const step = 15;
 
     const events: CreateEventDTO[] = [];
-    let currentDate = dto.min_date;
-    while (currentDate < dto.max_date) {
+    let currentDate = new Date(dto.min_date);
+    currentDate.setUTCHours(2);
+    const endDate = new Date(dto.max_date);
+    endDate.setUTCHours(25, 59, 59, 999);
+    while (currentDate < endDate) {
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       const event = {
         title: dto.name + ' - instance',
@@ -37,6 +40,8 @@ export class FlexEventsService {
       events.push(event);
       currentDate = new Date(currentDate.getTime() + step * 60 * 1000);
     }
+
+    console.log(events);
 
     const fixedEvents = await this.eventsService.getUserEventsInRange(user, dto.min_date, dto.max_date);
 

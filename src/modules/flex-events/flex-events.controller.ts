@@ -3,7 +3,6 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GetUser } from '../authentification/decorator';
 import { JwtGuard } from '../authentification/guard';
 import { User } from '../users/schemas/user.schema';
-import { FlexEventRequestDto } from './dtos/flex-event.request.dto';
 import { FlexEventDto, FlexEventsResponseDto } from './dtos/flex-event.response.dto';
 import { FlexEventsService } from './flex-events.service';
 
@@ -22,7 +21,7 @@ export class FlexEventsController {
   }
 
   @Post()
-  public async createFlexEvent(@GetUser() user: User, @Body() dto: FlexEventRequestDto): Promise<void> {
+  public async createFlexEvent(@GetUser() user: User, @Body() dto: any): Promise<void> {
     await this.flexEventService.createFlexEvent(user, dto);
   }
 }

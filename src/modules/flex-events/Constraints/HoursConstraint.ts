@@ -50,8 +50,8 @@ export class HoursConstraint extends Constraint<CreateEventDTO> {
     if (event.end_date.getTime() - event.start_date.getTime() > 1000 * 60 * 60 * 24) {
       return false; // if the event is longer than a day, it's not valid
     }
-    const eventStartTime = Time.fromDate(event.end_date);
-    const eventEndTime = Time.fromDate(event.start_date);
+    const eventStartTime = Time.fromDate(event.start_date);
+    const eventEndTime = Time.fromDate(event.end_date);
     const eventIsBetweenTwoDays = eventEndTime.isBefore(eventStartTime);
     if (eventIsBetweenTwoDays) {
       eventEndTime.hour += 24;
@@ -68,10 +68,10 @@ export class HoursConstraint extends Constraint<CreateEventDTO> {
 
 export class MorningAfternoonConstraint extends HoursConstraint {
   constructor(variable: string, type: 'morning' | 'afternoon') {
-    super(variable, new Time(7, 0), new Time(12, 0));
+    super(variable, new Time(9, 0), new Time(14, 0));
     if (type === 'afternoon') {
-      this.startTime = new Time(12, 0);
-      this.endTime = new Time(20, 0);
+      this.startTime = new Time(16, 0);
+      this.endTime = new Time(22, 0);
     }
   }
 }
