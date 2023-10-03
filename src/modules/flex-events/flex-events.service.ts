@@ -26,10 +26,12 @@ export class FlexEventsService {
     const step = 15;
 
     const events: CreateEventDTO[] = [];
-    let currentDate = new Date(dto.min_date);
-    currentDate.setUTCHours(2);
+    const startDate = new Date(dto.min_date);
+    startDate.setUTCHours(2);
     const endDate = new Date(dto.max_date);
     endDate.setUTCHours(25, 59, 59, 999);
+
+    let currentDate = new Date(startDate);
     while (currentDate < endDate) {
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       const event = {
@@ -41,9 +43,7 @@ export class FlexEventsService {
       currentDate = new Date(currentDate.getTime() + step * 60 * 1000);
     }
 
-    console.log(events);
-
-    const fixedEvents = await this.eventsService.getUserEventsInRange(user, dto.min_date, dto.max_date);
+    const fixedEvents = await this.eventsService.getUserEventsInRange(user, startDate, endDate);
 
     const csp = new CSP<CreateEventDTO>();
     csp.withVariable('event', events).withConstraint(new OverlapCalendarConstraint(['event'], fixedEvents));
