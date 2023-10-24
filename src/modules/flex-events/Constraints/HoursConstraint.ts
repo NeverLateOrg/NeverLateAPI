@@ -1,5 +1,6 @@
 import { CreateEventDTO } from 'src/modules/events/dtos';
 import { Constraint } from '../CPS/Constraint';
+import { EventCSP } from '../flex-events.service';
 
 export class Time {
   static fromDate(date: Date): Time {
@@ -35,7 +36,7 @@ export class Time {
   }
 }
 
-export class HoursConstraint extends Constraint<CreateEventDTO> {
+export class HoursConstraint extends Constraint<EventCSP> {
   protected startTime: Time;
   protected endTime: Time;
 

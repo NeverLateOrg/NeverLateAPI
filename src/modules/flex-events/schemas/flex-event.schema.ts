@@ -2,6 +2,8 @@
 import { Prop, Schema } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 import { Event } from 'src/modules/events/schemas/event.schema';
+import { UserCustomLocation } from 'src/modules/locations/user/custom/schemas/user.location.custom.schema';
+import { UserPlaceLocation } from 'src/modules/locations/user/place/schemas/user.location.place.schema';
 import SchemaFactoryCustom from 'src/utils/schemas/SchemaFactoryCustom';
 
 export type FlexEventDocument = FlexEvent & Document;
@@ -23,6 +25,15 @@ export class FlexEvent extends FlexEventMethods {
 
   @Prop({ type: Date, required: true })
   max_date: Date;
+
+  @Prop({ type: String })
+  location?: string;
+
+  @Prop({ type: String, enum: ['UserCustomLocation', 'UserPlaceLocation'] })
+  savedLocationType?: 'UserCustomLocation' | 'UserPlaceLocation';
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, refPath: 'savedLocationType' })
+  savedLocation?: UserCustomLocation | UserPlaceLocation;
 
   @Prop({ type: [mongoose.Schema.Types.Mixed], default: [] })
   constraints: object[];

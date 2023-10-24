@@ -1,18 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { CreateEventDTO } from '../events/dtos';
 import { EventsService } from '../events/events.service';
+import { GoogleService } from '../google/google.service';
+import { WeekOpeningPeriod } from '../locations/schemas/weekOpeningPeriod.schema';
+import { UserPlaceLocationsService } from '../locations/user/place/user.locations.place.service';
 import { User } from '../users/schemas/user.schema';
 import { MorningAfternoonConstraint } from './Constraints/HoursConstraint';
+import { OpeningHoursConstraint } from './Constraints/OpeningHoursConstraint';
 import { OverlapCalendarConstraint } from './Constraints/OverlapCalendarConstraint';
 import { CSP } from './CPS/Csp';
 import { FlexEventRequestDto } from './dtos/flex-event.request.dto';
 import { FlexEventsRepository } from './flex-events.repository';
 import { FlexEvent } from './schemas/flex-event.schema';
 
+export type EventCSP = CreateEventDTO & {
+  openingHours?: WeekOpeningPeriod;
+};
+
 @Injectable()
 export class FlexEventsService {
   constructor(
     private readonly flexEventRepository: FlexEventsRepository,
+    private readonly googleService: GoogleService,
+    private readonly placeLocationService: UserPlaceLocationsService,
     private readonly eventsService: EventsService,
   ) {}
 
@@ -24,8 +34,15 @@ export class FlexEventsService {
     const flexDoc = await this.flexEventRepository.create({ ...dto, user });
 
     const step = 15;
+    const events: EventCSP[] = [];
 
-    const events: CreateEventDTO[] = [];
+    // * get opening hours
+    let openingHours: WeekOpeningPeriod | undefined;
+    if (dto.savedLocationType === 'UserPlaceLocation' && dto.savedLocation !== undefined) {
+      const place = await this.placeLocationService.getPlaceLocation(user, dto.savedLocation);
+      openingHours = place.placeLocation.opening_hours;
+    }
+
     const startDate = new Date(dto.min_date);
     startDate.setUTCHours(2);
     const endDate = new Date(dto.max_date);
@@ -33,20 +50,26 @@ export class FlexEventsService {
 
     let currentDate = new Date(startDate);
     while (currentDate < endDate) {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      const event = {
+      const event: EventCSP = {
         title: dto.name + ' - instance',
         start_date: currentDate,
         end_date: new Date(currentDate.getTime() + 60 * 60 * 1000),
-      } as CreateEventDTO;
+        location: dto.location,
+        savedLocation: dto.savedLocation,
+        savedLocationType: dto.savedLocationType,
+        openingHours,
+      };
       events.push(event);
       currentDate = new Date(currentDate.getTime() + step * 60 * 1000);
     }
 
     const fixedEvents = await this.eventsService.getUserEventsInRange(user, startDate, endDate);
 
-    const csp = new CSP<CreateEventDTO>();
-    csp.withVariable('event', events).withConstraint(new OverlapCalendarConstraint(['event'], fixedEvents));
+    const csp = new CSP<EventCSP>();
+    csp
+      .withVariable('event', events)
+      .withConstraint(new OverlapCalendarConstraint(['event'], fixedEvents))
+      .withConstraint(new OpeningHoursConstraint(['event'], this.googleService, this.placeLocationService));
     for (const constraint of dto.constraints) {
       if (constraint.type === 'MorningAfternoonConstraint') {
         csp.withConstraint(new MorningAfternoonConstraint('event', constraint.choice));
