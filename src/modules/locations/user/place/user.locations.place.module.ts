@@ -15,5 +15,6 @@ import { UserPlaceLocationsService } from './user.locations.place.service';
   ],
   providers: [UserPlaceLocationsRepository, UserPlaceLocationsService],
   controllers: [UserPlaceLocationsController],
+  exports: [UserPlaceLocationsService],
 })
 export class UserPlaceLocationsModule {}
