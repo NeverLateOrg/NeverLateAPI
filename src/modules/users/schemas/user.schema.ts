@@ -25,6 +25,9 @@ export class User extends UserMethods {
 
   @Prop({ type: String, required: true })
   passwordHash: string;
+
+  @Prop({ type: [String], required: false })
+  trustedUsers: string[];
 }
 
 export const UserSchema = SchemaFactoryCustom.createForClass(User, UserMethods);
