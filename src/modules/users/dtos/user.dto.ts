@@ -21,4 +21,8 @@ export class UserDTO {
   @ApiProperty()
   @Expose()
   public email: string;
+
+  @Expose()
+  @ApiProperty()
+  public trustedUsers: string[];
 }

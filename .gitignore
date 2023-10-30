@@ -46,3 +46,4 @@ yarn-error.log
 build/config\.gypi
 
 data/
+.env
