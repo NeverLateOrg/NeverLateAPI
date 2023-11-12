@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateEventDTO } from '../events/dtos';
 import { EventsService } from '../events/events.service';
 import { GoogleService } from '../google/google.service';
 import { WeekOpeningPeriod } from '../locations/schemas/weekOpeningPeriod.schema';
 import { UserPlaceLocationsService } from '../locations/user/place/user.locations.place.service';
 import { User } from '../users/schemas/user.schema';
+import { UsersService } from '../users/users.service';
 import { MorningAfternoonConstraint } from './Constraints/HoursConstraint';
 import { OpeningHoursConstraint } from './Constraints/OpeningHoursConstraint';
 import { OverlapCalendarConstraint } from './Constraints/OverlapCalendarConstraint';
@@ -24,6 +25,7 @@ export class FlexEventsService {
     private readonly googleService: GoogleService,
     private readonly placeLocationService: UserPlaceLocationsService,
     private readonly eventsService: EventsService,
+    private readonly userService: UsersService,
   ) {}
 
   public async getMyFlexEvent(user: User): Promise<FlexEvent[]> {
@@ -73,6 +75,22 @@ export class FlexEventsService {
     for (const constraint of dto.constraints) {
       if (constraint.type === 'MorningAfternoonConstraint') {
         csp.withConstraint(new MorningAfternoonConstraint('event', constraint.choice));
+      } else if (constraint.type === 'UserConstraint') {
+        try {
+          const usersIds: string[] = [];
+          if (constraint.users !== undefined) usersIds.push(...constraint.users);
+          if (constraint.user !== undefined) usersIds.push(constraint.user);
+          for (const userId of usersIds) {
+            const otherUser = await this.userService.getUserFromIdWithPerm(user, userId);
+            if (otherUser === null) {
+              throw new Error('User not found');
+            }
+            const otherFixedEvents = await this.eventsService.getUserEventsInRange(otherUser, startDate, endDate);
+            csp.withConstraint(new OverlapCalendarConstraint(['event'], otherFixedEvents));
+          }
+        } catch (e) {
+          throw new BadRequestException(e.message);
+        }
       }
     }
 
