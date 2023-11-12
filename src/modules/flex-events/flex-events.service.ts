@@ -67,6 +67,8 @@ export class FlexEventsService {
 
     const fixedEvents = await this.eventsService.getUserEventsInRange(user, startDate, endDate);
 
+    const otherUsers: User[] = [];
+
     const csp = new CSP<EventCSP>();
     csp
       .withVariable('event', events)
@@ -87,6 +89,7 @@ export class FlexEventsService {
             }
             const otherFixedEvents = await this.eventsService.getUserEventsInRange(otherUser, startDate, endDate);
             csp.withConstraint(new OverlapCalendarConstraint(['event'], otherFixedEvents));
+            otherUsers.push(otherUser);
           }
         } catch (e) {
           throw new BadRequestException(e.message);
@@ -99,6 +102,9 @@ export class FlexEventsService {
       const { event } = await this.eventsService.createEvent(user, solution.event);
       flexDoc.event = event;
       await flexDoc.save();
+      for (const otherUser of otherUsers) {
+        await this.eventsService.createEvent(otherUser, solution.event);
+      }
     }
   }
 }
