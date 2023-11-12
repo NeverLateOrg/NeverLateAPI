@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
+import { ValidateNested } from 'class-validator';
 import { TransformObjectId } from 'src/utils/transformers';
 
 export class UserDTO {
@@ -23,6 +24,7 @@ export class UserDTO {
   public email: string;
 
   @Expose()
-  @ApiProperty()
-  public trustedUsers: string[];
+  @ApiProperty({ type: [UserDTO] })
+  @ValidateNested()
+  public trustedUsers: UserDTO[];
 }

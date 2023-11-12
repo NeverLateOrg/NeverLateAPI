@@ -26,8 +26,8 @@ export class User extends UserMethods {
   @Prop({ type: String, required: true })
   passwordHash: string;
 
-  @Prop({ type: [String], required: false })
-  trustedUsers: string[];
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], required: false })
+  trustedUsers: User[];
 }
 
 export const UserSchema = SchemaFactoryCustom.createForClass(User, UserMethods);

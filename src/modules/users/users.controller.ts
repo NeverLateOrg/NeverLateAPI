@@ -60,8 +60,6 @@ export class UsersController {
   @UseGuards(JwtGuard)
   @Post('share-id')
   public async addTrustedUser(@GetUser() user: User, @Body() token: SharedIdDTO): Promise<void> {
-    console.log(token);
-    console.log(token.token);
     await this.userService.addTrustedUser(user, token.token);
   }
 

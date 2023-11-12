@@ -13,8 +13,10 @@ export class UsersService {
 
   async getUserFromIdWithPerm(user: User, id: string): Promise<User | null> {
     const searchUser = await this.usersRepository.findById(id);
+    await searchUser?.populate('trustedUsers');
     if (searchUser == null) return null;
-    if (searchUser.trustedUsers.includes(user._id)) return searchUser;
+    if (searchUser.id === user._id) return searchUser;
+    if (searchUser.trustedUsers.some((tu) => tu._id.toString() === user._id.toString())) return searchUser;
     throw new UnauthorizedException('You are not trusted by this user');
   }
 
