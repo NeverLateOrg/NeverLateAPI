@@ -1,10 +1,13 @@
-import { Injectable } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/strict-boolean-expressions */
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Travels } from '../travels/Storage/storage.schema';
 import { TravelsStorageService } from '../travels/Storage/storage.service';
 import { User } from '../users/schemas/user.schema';
 import { CreateEventDTO, UpdateEventDTO } from './dtos';
 import { EventsRepository } from './events.repository';
 import { Event, EventStatus } from './schemas/event.schema';
+import ical = require('node-ical');
+
 @Injectable()
 export class EventsService {
   constructor(
@@ -20,6 +23,40 @@ export class EventsService {
     await this.travelStorageService.handleNewTravels(createdEvent);
     const travels = await this.travelStorageService.getTravelsOfEvent(createdEvent);
     return { event: createdEvent, travels };
+  }
+
+  public async addEventsFromIcs(user: User, url: string): Promise<any> {
+    return await new Promise((resolve, reject) => {
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      ical.async.fromURL(url, {}, async (err, data) => {
+        if (err) {
+          reject(new BadRequestException('Invalid ics file'));
+          return;
+        }
+        const events = Object.values(data) as any[];
+        for (const event of events) {
+          const createEventDTO: CreateEventDTO = {
+            title: event.summary,
+            start_date: event.start,
+            end_date: event.end,
+            location: event.location,
+          };
+          if (
+            createEventDTO.title === undefined ||
+            createEventDTO.start_date === undefined ||
+            createEventDTO.end_date === undefined
+          ) {
+            continue;
+          }
+          await this.eventRepository.createLocalEvent(user, createEventDTO);
+        }
+        resolve({ event: null, travels: null });
+      });
+      // const createdEvent = await this.eventRepository.createLocalEvent(user, createEventDTO);
+      // await this.travelStorageService.handleNewTravels(createdEvent);
+      // const travels = await this.travelStorageService.getTravelsOfEvent(createdEvent);
+      // return { event: createdEvent, travels };
+    });
   }
 
   public async updateEvent(

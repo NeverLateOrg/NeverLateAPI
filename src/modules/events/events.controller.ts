@@ -27,6 +27,7 @@ import { GetUser } from '../authentification/decorator';
 import { JwtGuard } from '../authentification/guard';
 import { User } from '../users/schemas/user.schema';
 import { CreateEventDTO, ResponseEventDTO, ResponseEventNoTravelsDTO, UpdateEventDTO } from './dtos';
+import { CreateEventsIcsDTO } from './dtos/create-events-ics.dto';
 import { EventsService } from './events.service';
 
 @ApiTags('Events')
@@ -53,6 +54,25 @@ export class EventsController {
     const { event, travels } = await this.eventService.createEvent(user, createEventDTO);
     const dto = ResponseEventDTO.build(event, travels);
     return dto;
+  }
+
+  @ApiBearerAuth()
+  @ApiCreatedResponse({
+    description: 'The events has been successfully added.',
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid data. Please check the request body.',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized',
+  })
+  @UseGuards(JwtGuard)
+  @Post('ics')
+  public async createEventsFromICS(
+    @GetUser() user: User,
+    @Body() createEventsIcsDTO: CreateEventsIcsDTO,
+  ): Promise<any> {
+    await this.eventService.addEventsFromIcs(user, createEventsIcsDTO.url);
   }
 
   @ApiBearerAuth()
