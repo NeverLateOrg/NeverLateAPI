@@ -30,6 +30,7 @@ export class EventsService {
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       ical.async.fromURL(url, {}, async (err, data) => {
         if (err) {
+          console.log(err);
           reject(new BadRequestException('Invalid ics file'));
           return;
         }
