@@ -48,7 +48,7 @@ export class EventsService {
           ) {
             continue;
           }
-          await this.eventRepository.createLocalEvent(user, createEventDTO);
+          await this.eventRepository.createLocalEvent(user, createEventDTO, false);
         }
         resolve({ event: null, travels: null });
       });

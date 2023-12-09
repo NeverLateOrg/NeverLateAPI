@@ -37,10 +37,10 @@ export class EventsRepository extends EntityRepository<EventDocument> {
     );
   }
 
-  public async createLocalEvent(user: User, createEventData: any): Promise<Event> {
+  public async createLocalEvent(user: User, createEventData: any, google = true): Promise<Event> {
     // by default a local event created by the user is set to accepted
     let event = await this.create({ ...createEventData, status: EventStatus.ACCEPTED, user: user._id });
-    if (event.location !== undefined) {
+    if (event.location !== undefined && google) {
       event.location = (await this.googleService.formatLocation(event.location)).formattedAddress;
     }
     event = await this.save(event);
