@@ -26,6 +26,9 @@ export class EventsService {
   }
 
   public async addEventsFromIcs(user: User, url: string): Promise<any> {
+    if (url.includes('vps-b1d8a48a.vps.ovh.net:8989')) {
+      url = url.replace('vps-b1d8a48a.vps.ovh.net:8989', 'express');
+    }
     return await new Promise((resolve, reject) => {
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       ical.async.fromURL(url, {}, async (err, data) => {
