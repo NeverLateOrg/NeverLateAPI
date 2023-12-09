@@ -28,7 +28,7 @@ export interface PlaceBasics {
 @Injectable()
 export class GoogleService {
   // temp hardcoded (will be change)
-  private readonly GOOGLE_API_KEY = 'AIzaSyDMC_6DlM8RicLOfCH-7Zll1aZUqC5Ir8g';
+  private readonly GOOGLE_API_KEY = process.env.GOOGLE_API_KEY ?? 'AIzaSyAI8zms4ndQVtz0sMyUCd6oElh7GK0LGx0';
 
   constructor(private readonly client: Client) {}
 
