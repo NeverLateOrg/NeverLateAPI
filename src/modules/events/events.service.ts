@@ -27,7 +27,7 @@ export class EventsService {
 
   public async addEventsFromIcs(user: User, url: string): Promise<any> {
     if (url.includes('vps-b1d8a48a.vps.ovh.net:8989')) {
-      url = url.replace('vps-b1d8a48a.vps.ovh.net:8989', 'express');
+      url = url.replace('vps-b1d8a48a.vps.ovh.net:8989', 'express:8989');
     }
     return await new Promise((resolve, reject) => {
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
