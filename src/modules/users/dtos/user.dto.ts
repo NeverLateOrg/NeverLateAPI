@@ -2,9 +2,28 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
 import { ValidateNested } from 'class-validator';
 import { TransformObjectId } from 'src/utils/transformers';
+import { User } from '../schemas/user.schema';
 
 export class UserDTO {
-  @Exclude()
+  static toDto(user: User): UserDTO {
+    const formateTrusted = user.trustedUsers.map((trustedUser) => ({
+      _id: trustedUser._id.toString(),
+      firstName: trustedUser.firstName,
+      lastName: trustedUser.lastName,
+      email: trustedUser.email,
+    }));
+    return {
+      _id: user._id.toString(),
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      // @ts-expect-error
+      trustedUsers: formateTrusted,
+    };
+  }
+
+  @Expose()
+  @ApiProperty()
   @TransformObjectId()
   public _id: string;
 

@@ -30,7 +30,7 @@ export class UsersController {
   @UseGuards(JwtGuard)
   @Get('me')
   async getMe(@GetUser() user: User): Promise<UserDTO> {
-    return toDTO(UserDTO, user);
+    return UserDTO.toDto(user);
   }
 
   @ApiOkResponse({
@@ -44,7 +44,7 @@ export class UsersController {
   @UseGuards(JwtGuard)
   @Put('me')
   public async updateMe(@GetUser() user: User, @Body() updateUserDto: UpdateUserDTO): Promise<UserDTO> {
-    return toDTO(UserDTO, user);
+    return UserDTO.toDto(user);
   }
 
   @ApiOkResponse({
@@ -71,9 +71,9 @@ export class UsersController {
   @ApiBadRequestResponse({})
   @UseGuards(JwtGuard)
   @Get(':id')
-  async getUser(@GetUser() user: User, @Param('id') id): Promise<UserDTO> {
+  async getUser(@GetUser() user: User, @Param('id') id: string): Promise<UserDTO> {
     const userDoc = await this.userService.getUserFromIdWithPerm(user, id);
     if (userDoc == null) throw new NotFoundException('User not found');
-    return toDTO(UserDTO, userDoc);
+    return UserDTO.toDto(userDoc);
   }
 }

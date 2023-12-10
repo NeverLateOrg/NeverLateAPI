@@ -37,7 +37,9 @@ export class AuthService {
   }
 
   async login(loginDTO: LoginDTO): Promise<string> {
+    console.log(await this.userRepository.find({}));
     const user = await this.userRepository.findOne({ email: loginDTO.email });
+
     if (user == null) throw new ForbiddenException('Credentials incorrect');
 
     const pwMatches = await argon.verify(user.passwordHash, loginDTO.password);
